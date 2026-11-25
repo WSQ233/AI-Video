@@ -27,23 +27,29 @@ def run_cmd(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subp
 
 
 def detect_gpu_tier() -> tuple[str, str]:
-    """检测当前 GPU 型号并映射到 runtime_profile 档位。"""
+    """检测当前 GPU 型号与精确显存，自动区分 A100_40GB / A100_80GB / H100 / L4。"""
     try:
         out = subprocess.check_output(
-            ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
+            ["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader,nounits"],
             text=True,
         ).strip()
     except Exception:
         return "DEFAULT", "No GPU detected"
 
-    upper = out.upper()
+    first_line = out.splitlines()[0]
+    parts = [p.strip() for p in first_line.split(",")]
+    name = parts[0] if parts else first_line
+    vram_mb = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
+    display = f"{name} ({vram_mb / 1024:.1f} GB VRAM)" if vram_mb else name
+
+    upper = name.upper()
     if "H100" in upper:
-        return "H100", out
+        return "H100", display
     if "A100" in upper:
-        return "A100", out
+        return ("A100_80GB" if vram_mb >= 65000 else "A100_40GB"), display
     if "L4" in upper:
-        return "L4", out
-    return "DEFAULT", out
+        return "L4", display
+    return "DEFAULT", display
 
 
 def clone_or_checkout(repo_url: str, dest: Path, commit: str = "HEAD") -> None:
@@ -204,7 +210,7 @@ def main() -> int:
     custom_nodes_dir.mkdir(parents=True, exist_ok=True)
     for node in nodes_lock["custom_nodes"]:
         enabled = bool(node.get("enabled", False))
-        if node["name"] == "ComfyUI-LTXVideo" and (args.enable_ltx or "ltx25_av" in packs):
+        if node["name"] == "ComfyUI-LTXVideo" and (args.enable_ltx or any(p.startswith("ltx25") for p in packs)):
             enabled = True
         if not enabled:
             continue

@@ -1,34 +1,45 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "project_name": "AI-Video",
   "git_repo": "https://github.com/WSQ233/AI-Video.git",
   "drive_root": "/content/drive/MyDrive/AI_Video",
   "comfyui_dir": "/content/ComfyUI",
   "default_packs": [
-    "wan22_i2v_fp16",
-    "wan22_lightx2v_lora"
+    "wan22_i2v_fp8",
+    "wan22_lightx2v_lora",
+    "flux2_keyframe"
   ],
   "model_load_mode": "copy_to_local",
   "copy_workers": 4,
   "gpu_profiles": {
+    "A100_40GB": {
+      "comfyui_args": "--normalvram --bf16-vae --listen 127.0.0.1 --port 8188",
+      "install_sageattention": false,
+      "recommended_packs": ["wan22_i2v_fp8", "wan22_lightx2v_lora", "flux2_keyframe", "wan22_t2v_fp8", "ltx25_av_a100"],
+      "note": "Colab A100 40GB 黄金配置：使用 FP8 Scaled / INT8 权重全驻留 40GB HBM2e，零 OOM、无慢速 CPU BlockSwap，配合 --normalvram 优雅释放 Text Encoder 显存。"
+    },
+    "A100_80GB": {
+      "comfyui_args": "--highvram --bf16-unet --bf16-vae --bf16-text-enc --listen 127.0.0.1 --port 8188",
+      "install_sageattention": false,
+      "recommended_packs": ["wan22_i2v_fp16", "wan22_lightx2v_lora", "flux2_keyframe"],
+      "note": "A100 80GB 可直接满血运行 FP16 权重"
+    },
     "H100": {
       "comfyui_args": "--highvram --bf16-unet --bf16-vae --bf16-text-enc --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
-      "note": "H100 默认启用 PyTorch 原生 FlashAttention (SDPA) 保障零噪点稳定运行；确认跑通后可将 install_sageattention 设为 true 进一步提速。"
-    },
-    "A100": {
-      "comfyui_args": "--highvram --bf16-unet --bf16-vae --listen 127.0.0.1 --port 8188",
-      "install_sageattention": false,
-      "note": "A100 40GB/80GB 兼容配置"
+      "recommended_packs": ["wan22_i2v_fp16", "wan22_lightx2v_lora", "flux2_keyframe"],
+      "note": "H100 80GB 满血配置"
     },
     "L4": {
       "comfyui_args": "--normalvram --fp8_e4m3fn-unet --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
-      "note": "L4 24GB 建议使用 wan22_i2v_fp8 模型包"
+      "recommended_packs": ["wan22_i2v_fp8", "wan22_lightx2v_lora"],
+      "note": "L4 24GB 兼容配置"
     },
     "DEFAULT": {
       "comfyui_args": "--normalvram --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
+      "recommended_packs": ["wan22_i2v_fp8", "wan22_lightx2v_lora"],
       "note": "通用兜底配置"
     }
   }

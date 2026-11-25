@@ -1,50 +1,13 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "drive_root_default": "/content/drive/MyDrive/AI_Video",
   "packs": {
-    "wan22_i2v_fp16": {
-      "label": "Wan 2.2 14B 图生视频 (FP16 满血版 · H100 主力推荐)",
-      "license": "Apache-2.0",
-      "requires_hf_token": false,
-      "estimated_gb": 69,
-      "recommended_for": ["H100"],
-      "files": [
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
-          "fallback_keywords": ["wan2.2", "i2v", "high_noise", "14B", "fp16"],
-          "target_subdir": "diffusion_models",
-          "filename": "wan2.2_i2v_high_noise_14B_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
-          "fallback_keywords": ["wan2.2", "i2v", "low_noise", "14B", "fp16"],
-          "target_subdir": "diffusion_models",
-          "filename": "wan2.2_i2v_low_noise_14B_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
-          "fallback_keywords": ["umt5_xxl", "fp16"],
-          "target_subdir": "text_encoders",
-          "filename": "umt5_xxl_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/vae/wan_2.1_vae.safetensors",
-          "fallback_keywords": ["wan_2.1_vae"],
-          "target_subdir": "vae",
-          "filename": "wan_2.1_vae.safetensors"
-        }
-      ]
-    },
     "wan22_i2v_fp8": {
-      "label": "Wan 2.2 14B 图生视频 (FP8 Scaled 轻量高速版 · H100/A100/L4 通用)",
+      "label": "Wan 2.2 14B 图生视频 (FP8 Scaled · A100 40GB 最强主力)",
       "license": "Apache-2.0",
       "requires_hf_token": false,
       "estimated_gb": 36,
-      "recommended_for": ["H100", "A100", "L4"],
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100", "L4"],
       "files": [
         {
           "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
@@ -76,49 +39,12 @@
         }
       ]
     },
-    "wan22_t2v_fp16": {
-      "label": "Wan 2.2 14B 文生视频 (FP16 满血版 · 复用 UMT5 与 VAE)",
-      "license": "Apache-2.0",
-      "requires_hf_token": false,
-      "estimated_gb": 57,
-      "recommended_for": ["H100"],
-      "files": [
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp16.safetensors",
-          "fallback_keywords": ["wan2.2", "t2v", "high_noise", "14B", "fp16"],
-          "target_subdir": "diffusion_models",
-          "filename": "wan2.2_t2v_high_noise_14B_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp16.safetensors",
-          "fallback_keywords": ["wan2.2", "t2v", "low_noise", "14B", "fp16"],
-          "target_subdir": "diffusion_models",
-          "filename": "wan2.2_t2v_low_noise_14B_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
-          "fallback_keywords": ["umt5_xxl", "fp16"],
-          "target_subdir": "text_encoders",
-          "filename": "umt5_xxl_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/vae/wan_2.1_vae.safetensors",
-          "fallback_keywords": ["wan_2.1_vae"],
-          "target_subdir": "vae",
-          "filename": "wan_2.1_vae.safetensors"
-        }
-      ]
-    },
     "wan22_lightx2v_lora": {
-      "label": "Wan 2.2 LightX2V 4步加速蒸馏 LoRA (强烈推荐搭配 Wan 2.2)",
+      "label": "Wan 2.2 LightX2V 4步蒸馏加速 LoRA (强烈必装 · 提速 4~5 倍)",
       "license": "Apache-2.0",
       "requires_hf_token": false,
       "estimated_gb": 2.5,
-      "recommended_for": ["H100", "A100", "L4"],
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100", "L4"],
       "files": [
         {
           "repo_id": "lightx2v/Wan2.2-Lightning",
@@ -137,11 +63,11 @@
       ]
     },
     "flux2_keyframe": {
-      "label": "FLUX.2 [dev] FP8 Mixed 首帧关键帧生图包",
-      "license": "FLUX.2 Non-Commercial / Dev",
+      "label": "FLUX.2 [dev] FP8 Mixed 首帧/关键帧生图主力 (A100 40GB 完美适配)",
+      "license": "FLUX.2 Dev License",
       "requires_hf_token": false,
       "estimated_gb": 45,
-      "recommended_for": ["H100", "A100"],
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100"],
       "files": [
         {
           "repo_id": "Comfy-Org/Flux-2-Dev",
@@ -166,26 +92,63 @@
         }
       ]
     },
-    "ltx25_av": {
-      "label": "LTX-2.5 22B BF16 原生音画同步视频包 (需 HF_TOKEN 并先在 HF 同意协议)",
-      "license": "LTX Community License",
-      "requires_hf_token": true,
-      "estimated_gb": 70,
-      "recommended_for": ["H100"],
+    "wan22_t2v_fp8": {
+      "label": "Wan 2.2 14B 文生视频 (FP8 Scaled · A100 40GB 复用 UMT5 与 VAE)",
+      "license": "Apache-2.0",
+      "requires_hf_token": false,
+      "estimated_gb": 29,
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100", "L4"],
       "files": [
         {
-          "repo_id": "Lightricks/LTX-2.5",
-          "repo_path": "ltx-2.5-22b-dev-transformer-bf16.safetensors",
-          "fallback_keywords": ["ltx-2.5", "22b", "dev", "bf16", ".safetensors"],
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+          "fallback_keywords": ["wan2.2", "t2v", "high_noise", "14B", "fp8"],
           "target_subdir": "diffusion_models",
-          "filename": "ltx-2.5-22b-dev-transformer-bf16.safetensors"
+          "filename": "wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors"
         },
         {
-          "repo_id": "Lightricks/LTX-2.5",
-          "repo_path": "gemma4-12b-with-proj-ltx-2.5-bf16.safetensors",
-          "fallback_keywords": ["gemma", "proj", "bf16", ".safetensors"],
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+          "fallback_keywords": ["wan2.2", "t2v", "low_noise", "14B", "fp8"],
+          "target_subdir": "diffusion_models",
+          "filename": "wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+          "fallback_keywords": ["umt5_xxl", "fp8"],
           "target_subdir": "text_encoders",
-          "filename": "gemma4-12b-with-proj-ltx-2.5-bf16.safetensors"
+          "filename": "umt5_xxl_fp8_e4m3fn_scaled.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/vae/wan_2.1_vae.safetensors",
+          "fallback_keywords": ["wan_2.1_vae"],
+          "target_subdir": "vae",
+          "filename": "wan_2.1_vae.safetensors"
+        }
+      ]
+    },
+    "ltx25_av_a100": {
+      "label": "LTX-2.5 22B INT8-ConvRot 原生音画同步包 (A100 40GB 适配 · 需 HF_TOKEN)",
+      "license": "LTX Community License",
+      "requires_hf_token": true,
+      "estimated_gb": 39,
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100"],
+      "files": [
+        {
+          "repo_id": "DmitryDB/LTX-2.5-ComfyUI-Quants",
+          "repo_path": "diffusion_models/ltx-2.5-22b-dev-transformer-comfy-int8-convrot.safetensors",
+          "fallback_keywords": ["22b", "dev", "int8", ".safetensors"],
+          "target_subdir": "diffusion_models",
+          "filename": "ltx-2.5-22b-dev-transformer-int8-convrot.safetensors"
+        },
+        {
+          "repo_id": "DmitryDB/LTX-2.5-ComfyUI-Quants",
+          "repo_path": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+          "fallback_keywords": ["gemma", "int8", ".safetensors"],
+          "target_subdir": "text_encoders",
+          "filename": "gemma4-12b-with-proj-ltx-2.5-int8-convrot.safetensors"
         },
         {
           "repo_id": "Lightricks/LTX-2.5",
@@ -207,6 +170,43 @@
           "fallback_keywords": ["spatial-upscaler", "bf16", ".safetensors"],
           "target_subdir": "latent_upscale_models",
           "filename": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors"
+        }
+      ]
+    },
+    "wan22_i2v_fp16": {
+      "label": "Wan 2.2 14B 图生视频 (FP16 满血版 · 仅限 A100 80GB / H100)",
+      "license": "Apache-2.0",
+      "requires_hf_token": false,
+      "estimated_gb": 69,
+      "recommended_for": ["A100_80GB", "H100"],
+      "files": [
+        {
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
+          "fallback_keywords": ["wan2.2", "i2v", "high_noise", "14B", "fp16"],
+          "target_subdir": "diffusion_models",
+          "filename": "wan2.2_i2v_high_noise_14B_fp16.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
+          "fallback_keywords": ["wan2.2", "i2v", "low_noise", "14B", "fp16"],
+          "target_subdir": "diffusion_models",
+          "filename": "wan2.2_i2v_low_noise_14B_fp16.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
+          "fallback_keywords": ["umt5_xxl", "fp16"],
+          "target_subdir": "text_encoders",
+          "filename": "umt5_xxl_fp16.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+          "repo_path": "split_files/vae/wan_2.1_vae.safetensors",
+          "fallback_keywords": ["wan_2.1_vae"],
+          "target_subdir": "vae",
+          "filename": "wan_2.1_vae.safetensors"
         }
       ]
     }
