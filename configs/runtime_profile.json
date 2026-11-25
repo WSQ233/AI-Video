@@ -5,9 +5,9 @@
   "drive_root": "/content/drive/MyDrive/AI_Video",
   "comfyui_dir": "/content/ComfyUI",
   "default_packs": [
-    "wan22_i2v_fp8",
-    "wan22_lightx2v_lora",
-    "flux2_keyframe"
+    "minimax_h3_fl2va_a100",
+    "minimax_h3_ref2va_a100",
+    "minimax_h3_turbo_lora"
   ],
   "model_load_mode": "copy_to_local",
   "copy_workers": 4,

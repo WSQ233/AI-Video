@@ -1,9 +1,99 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "drive_root_default": "/content/drive/MyDrive/AI_Video",
   "packs": {
+    "minimax_h3_fl2va_a100": {
+      "label": "MiniMax H3 FL2VA (INT8-ConvRot · A100 40GB 第一主力：首尾帧/图生/文生 + 32kHz 立体声音画同步 + 最长15秒)",
+      "license": "MiniMax Community License",
+      "requires_hf_token": false,
+      "estimated_gb": 54,
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100"],
+      "files": [
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+          "fallback_keywords": ["fl2va", "int8", "convrot", ".safetensors"],
+          "target_subdir": "diffusion_models",
+          "filename": "minimax_h3_fl2va_pruned_int8_convrot.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+          "fallback_keywords": ["qwen3vl", "int8", "convrot", ".safetensors"],
+          "target_subdir": "text_encoders",
+          "filename": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/vae/minimax_h3_video_vae_int8_convrot.safetensors",
+          "fallback_keywords": ["video", "vae", ".safetensors"],
+          "target_subdir": "vae",
+          "filename": "minimax_h3_video_vae_int8_convrot.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/vae/minimax_h3_audio_vae.safetensors",
+          "fallback_keywords": ["audio", "vae", ".safetensors"],
+          "target_subdir": "vae",
+          "filename": "minimax_h3_audio_vae.safetensors"
+        }
+      ]
+    },
+    "minimax_h3_ref2va_a100": {
+      "label": "MiniMax H3 Ref2VA (INT8-ConvRot · 多图/视频/音频全能参考锁角色，复用编码器与VAE仅增~21GB)",
+      "license": "MiniMax Community License",
+      "requires_hf_token": false,
+      "estimated_gb": 21,
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100"],
+      "files": [
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+          "fallback_keywords": ["ref2va", "int8", "convrot", ".safetensors"],
+          "target_subdir": "diffusion_models",
+          "filename": "minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+          "fallback_keywords": ["qwen3vl", "int8", "convrot", ".safetensors"],
+          "target_subdir": "text_encoders",
+          "filename": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/vae/minimax_h3_video_vae_int8_convrot.safetensors",
+          "fallback_keywords": ["video", "vae", ".safetensors"],
+          "target_subdir": "vae",
+          "filename": "minimax_h3_video_vae_int8_convrot.safetensors"
+        },
+        {
+          "repo_id": "Comfy-Org/MiniMax-H3",
+          "repo_path": "split_files/vae/minimax_h3_audio_vae.safetensors",
+          "fallback_keywords": ["audio", "vae", ".safetensors"],
+          "target_subdir": "vae",
+          "filename": "minimax_h3_audio_vae.safetensors"
+        }
+      ]
+    },
+    "minimax_h3_turbo_lora": {
+      "label": "MiniMax H3 Turbo 极速加速 LoRA (4~8步出片，大幅降低 A100 CU 消耗)",
+      "license": "Community",
+      "requires_hf_token": false,
+      "estimated_gb": 2,
+      "recommended_for": ["A100_40GB", "A100_80GB", "H100"],
+      "files": [
+        {
+          "repo_id": "lightx2v/Minimax-h3-Turbo",
+          "repo_path": "minimax_h3_turbo_lora.safetensors",
+          "fallback_keywords": [".safetensors"],
+          "target_subdir": "loras",
+          "filename": "minimax_h3_turbo_lora.safetensors"
+        }
+      ]
+    },
     "wan22_i2v_fp8": {
-      "label": "Wan 2.2 14B 图生视频 (FP8 Scaled · A100 40GB 最强主力)",
+      "label": "Wan 2.2 14B 图生视频 (FP8 Scaled · Apache 2.0 商用无忧 / 高频极速批处理主力)",
       "license": "Apache-2.0",
       "requires_hf_token": false,
       "estimated_gb": 36,
@@ -40,7 +130,7 @@
       ]
     },
     "wan22_lightx2v_lora": {
-      "label": "Wan 2.2 LightX2V 4步蒸馏加速 LoRA (强烈必装 · 提速 4~5 倍)",
+      "label": "Wan 2.2 LightX2V 4步蒸馏加速 LoRA (搭配 Wan 2.2 提速 4~5 倍)",
       "license": "Apache-2.0",
       "requires_hf_token": false,
       "estimated_gb": 2.5,
@@ -93,7 +183,7 @@
       ]
     },
     "wan22_t2v_fp8": {
-      "label": "Wan 2.2 14B 文生视频 (FP8 Scaled · A100 40GB 复用 UMT5 与 VAE)",
+      "label": "Wan 2.2 14B 文生视频 (FP8 Scaled · 复用 UMT5 与 VAE)",
       "license": "Apache-2.0",
       "requires_hf_token": false,
       "estimated_gb": 29,
@@ -130,7 +220,7 @@
       ]
     },
     "ltx25_av_a100": {
-      "label": "LTX-2.5 22B INT8-ConvRot 原生音画同步包 (A100 40GB 适配 · 需 HF_TOKEN)",
+      "label": "LTX-2.5 22B INT8-ConvRot 原生音画同步备选包 (需 HF_TOKEN)",
       "license": "LTX Community License",
       "requires_hf_token": true,
       "estimated_gb": 39,
@@ -170,43 +260,6 @@
           "fallback_keywords": ["spatial-upscaler", "bf16", ".safetensors"],
           "target_subdir": "latent_upscale_models",
           "filename": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors"
-        }
-      ]
-    },
-    "wan22_i2v_fp16": {
-      "label": "Wan 2.2 14B 图生视频 (FP16 满血版 · 仅限 A100 80GB / H100)",
-      "license": "Apache-2.0",
-      "requires_hf_token": false,
-      "estimated_gb": 69,
-      "recommended_for": ["A100_80GB", "H100"],
-      "files": [
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors",
-          "fallback_keywords": ["wan2.2", "i2v", "high_noise", "14B", "fp16"],
-          "target_subdir": "diffusion_models",
-          "filename": "wan2.2_i2v_high_noise_14B_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors",
-          "fallback_keywords": ["wan2.2", "i2v", "low_noise", "14B", "fp16"],
-          "target_subdir": "diffusion_models",
-          "filename": "wan2.2_i2v_low_noise_14B_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/text_encoders/umt5_xxl_fp16.safetensors",
-          "fallback_keywords": ["umt5_xxl", "fp16"],
-          "target_subdir": "text_encoders",
-          "filename": "umt5_xxl_fp16.safetensors"
-        },
-        {
-          "repo_id": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
-          "repo_path": "split_files/vae/wan_2.1_vae.safetensors",
-          "fallback_keywords": ["wan_2.1_vae"],
-          "target_subdir": "vae",
-          "filename": "wan_2.1_vae.safetensors"
         }
       ]
     }
