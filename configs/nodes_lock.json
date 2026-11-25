@@ -31,8 +31,8 @@
       "name": "ComfyUI-WanVideoWrapper",
       "repo": "https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
       "commit": "HEAD",
-      "enabled": true,
-      "purpose": "Wan 2.2 高级特性封装（LightX2V LoRA / SageAttention / TeaCache 等）"
+      "enabled": false,
+      "purpose": "Wan 2.2 可选封装（仅使用 Wan 2.2 时开启）"
     },
     {
       "name": "ComfyUI-LTXVideo",
