@@ -95,13 +95,13 @@ def copy_one_file(src: Path, dst: Path) -> str:
 def stage_models_from_drive(
     manifest: dict[str, Any],
     packs: list[str],
-    drive_root: Path,
+    shared_models_dir: Path,
     comfy_dir: Path,
     mode: str,
     workers: int,
 ) -> list[str]:
-    """按选定 pack 将模型从 5TB Google Drive 准备到本地 ComfyUI/models。"""
-    drive_models = drive_root / "models"
+    """按选定 pack 将模型从 5TB Google Drive 共享模型库准备到本地 ComfyUI/models。"""
+    drive_models = shared_models_dir
     local_models = comfy_dir / "models"
     missing: list[str] = []
 
@@ -150,10 +150,10 @@ def stage_models_from_drive(
     return missing
 
 
-def write_extra_model_paths(comfy_dir: Path, drive_root: Path) -> None:
-    """将 Google Drive 全量模型目录注册为额外路径，方便临时切换未预拷的模型。"""
-    yaml_content = f"""drive_5t:
-    base_path: {drive_root / 'models'}
+def write_extra_model_paths(comfy_dir: Path, shared_models_dir: Path) -> None:
+    """将 Google Drive 全局共享模型库注册为额外路径，方便临时切换未预拷的模型。"""
+    yaml_content = f"""drive_5t_shared:
+    base_path: {shared_models_dir}
     diffusion_models: diffusion_models/
     text_encoders: text_encoders/
     vae: vae/
@@ -165,13 +165,27 @@ def write_extra_model_paths(comfy_dir: Path, drive_root: Path) -> None:
     (comfy_dir / "extra_model_paths.yaml").write_text(yaml_content, encoding="utf-8")
 
 
+def sync_project_files_to_drive(repo_root: Path, project_dir: Path, project_id: str) -> None:
+    """确保独立项目云端目录存在，并将仓库中的剧本/任务表同步到该项目目录（不覆盖云盘已有修改）。"""
+    for sub in ("inputs", "workflows", "outputs", "logs"):
+        (project_dir / sub).mkdir(parents=True, exist_ok=True)
+    src_pdir = repo_root / "projects" / project_id
+    if src_pdir.exists():
+        for fname in ("project.json", "script.md", "tasks.csv"):
+            src = src_pdir / fname
+            dst = project_dir / fname
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Colab H100 ComfyUI 一键装机脚本")
+    parser = argparse.ArgumentParser(description="Colab GPU ComfyUI 一键装机脚本（支持独立项目挂载）")
     parser.add_argument("--repo-root", default=".", help="AI-Video 仓库根目录")
+    parser.add_argument("--project", default=None, help="本次挂载的独立项目 ID（如 01_rainy_signal）")
     parser.add_argument("--packs", nargs="*", default=None, help="本次预热的模型包 ID")
     parser.add_argument("--mode", choices=["copy_to_local", "symlink"], default=None, help="模型加载模式")
     parser.add_argument("--enable-ltx", action="store_true", help="强制启用 ComfyUI-LTXVideo 节点")
-    parser.add_argument("--sageattention", action="store_true", help="安装 SageAttention 2.x (H100 可选极致提速)")
+    parser.add_argument("--sageattention", action="store_true", help="安装 SageAttention 2.x (可选提速)")
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root).resolve()
@@ -180,6 +194,10 @@ def main() -> int:
     manifest = json.loads((repo_root / "configs/models_manifest.json").read_text(encoding="utf-8"))
 
     drive_root = Path(profile["drive_root"])
+    shared_dir = drive_root / profile.get("shared_subdir", "shared")
+    shared_models_dir = shared_dir / "models"
+    project_id = args.project or profile.get("default_project", "01_rainy_signal")
+    project_dir = drive_root / "projects" / project_id
     comfy_dir = Path(profile["comfyui_dir"])
     packs = args.packs if args.packs else profile["default_packs"]
     mode = args.mode or profile.get("model_load_mode", "copy_to_local")
@@ -190,10 +208,11 @@ def main() -> int:
     disk_free_gb = shutil.disk_usage("/content" if Path("/content").exists() else ".").free / (1024 ** 3)
 
     print("==========================================")
-    print(f"GPU 检测     : {gpu_raw} -> 档位 [{gpu_tier}]")
-    print(f"本地剩余磁盘 : {disk_free_gb:.1f} GB")
-    print(f"Drive 根目录 : {drive_root}")
-    print(f"启用模型包   : {', '.join(packs)} (模式: {mode})")
+    print(f"GPU 检测       : {gpu_raw} -> 档位 [{gpu_tier}]")
+    print(f"本地剩余磁盘   : {disk_free_gb:.1f} GB")
+    print(f"云端共享模型库 : {shared_models_dir}")
+    print(f"当前独立项目   : {project_id} -> {project_dir}")
+    print(f"启用模型包     : {', '.join(packs)} (模式: {mode})")
     print("==========================================")
 
     # 1. 安装 ComfyUI 核心
@@ -225,27 +244,33 @@ def main() -> int:
         print("[可选加速] 正在安装 SageAttention...")
         run_cmd([sys.executable, "-m", "pip", "install", "-q", "sageattention>=2.2.0"], check=False)
 
-    # 4. 持久化目录软链接直连 5TB Google Drive
-    print("\n[持久化绑定] 绑定输入/输出/工作流到 5TB Google Drive...")
-    ensure_symlink(comfy_dir / "input", drive_root / "inputs")
-    ensure_symlink(comfy_dir / "output", drive_root / "outputs")
-    ensure_symlink(comfy_dir / "user" / "default" / "workflows", drive_root / "workflows")
+    # 4. 初始化独立项目云端目录并软链接直连 ComfyUI（输入/输出严格隔离到当前项目下！）
+    print(f"\n[项目云端绑定] 将 ComfyUI 挂载到独立项目: {project_dir}")
+    sync_project_files_to_drive(repo_root, project_dir, project_id)
+    (shared_dir / "workflows").mkdir(parents=True, exist_ok=True)
+    (shared_dir / "logs").mkdir(parents=True, exist_ok=True)
+    ensure_symlink(comfy_dir / "input", project_dir / "inputs")
+    ensure_symlink(comfy_dir / "output", project_dir / "outputs")
+    ensure_symlink(comfy_dir / "user" / "default" / "workflows", project_dir / "workflows")
 
-    # 5. 准备模型权重 + 写 extra_model_paths.yaml
+    # 5. 准备共享模型权重 + 写 extra_model_paths.yaml
     missing = stage_models_from_drive(
         manifest=manifest,
         packs=packs,
-        drive_root=drive_root,
+        shared_models_dir=shared_models_dir,
         comfy_dir=comfy_dir,
         mode=mode,
         workers=workers,
     )
-    write_extra_model_paths(comfy_dir, drive_root)
+    write_extra_model_paths(comfy_dir, shared_models_dir)
 
     # 6. 写入本次启动参数供 Notebook 直接读取
     launch_info = {
         "gpu_tier": gpu_tier,
         "gpu_raw": gpu_raw,
+        "project_id": project_id,
+        "project_dir": str(project_dir),
+        "shared_dir": str(shared_dir),
         "comfyui_dir": str(comfy_dir),
         "comfyui_args": gpu_cfg["comfyui_args"],
         "packs": packs,
@@ -254,11 +279,11 @@ def main() -> int:
     (comfy_dir / "launch_info.json").write_text(json.dumps(launch_info, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if missing:
-        print("\n[注意] 以下模型文件尚未在 Google Drive 中找到，请先在免费 CPU 运行 00_sync_models_to_drive.ipynb 下载：")
+        print("\n[注意] 以下共享模型尚未在 5TB Google Drive 中找到，请先在免费 CPU 运行 00_sync_models_to_drive.ipynb 下载：")
         for m in missing:
             print(f"  - {m}")
     else:
-        print("\n[预检通过] 所有选定模型包均已就绪！")
+        print("\n[预检通过] 所有选定模型包与独立项目目录均已就绪！")
 
     print(f"[推荐启动参数] python main.py {gpu_cfg['comfyui_args']}")
     return 0

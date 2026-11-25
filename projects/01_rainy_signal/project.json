@@ -1,0 +1,15 @@
+{
+  "project_id": "01_rainy_signal",
+  "title": "雨夜信号 / Rainy Signal",
+  "type": "test_short_film",
+  "engine": "MiniMax-H3-33.1B-BF16",
+  "active_packs": [
+    "minimax_h3_fl2va_bf16",
+    "minimax_h3_ref2va_bf16",
+    "minimax_h3_turbo_lora"
+  ],
+  "resolution": "1280x720",
+  "fps": 24,
+  "shots": 3,
+  "cloud_dir": "/content/drive/MyDrive/AI_Video/projects/01_rainy_signal"
+}

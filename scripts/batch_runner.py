@@ -104,10 +104,11 @@ def append_manifest(manifest_path: Path, record: dict[str, Any]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="ComfyUI Headless 批处理执行器（支持断点续传）")
-    parser.add_argument("--tasks-csv", required=True, help="任务表 CSV 路径")
-    parser.add_argument("--workflows-dir", required=True, help="API 工作流 JSON 目录")
-    parser.add_argument("--output-dir", required=True, help="Google Drive 输出目录")
+    parser = argparse.ArgumentParser(description="ComfyUI Headless 批处理执行器（按项目目录隔离，支持断点续传）")
+    parser.add_argument("--tasks-csv", required=True, help="项目任务表 tasks.csv 路径")
+    parser.add_argument("--workflows-dir", required=True, help="项目专属工作流目录")
+    parser.add_argument("--shared-workflows-dir", default=None, help="全局共享工作流目录（项目目录未找到时自动兜底）")
+    parser.add_argument("--output-dir", required=True, help="项目输出目录")
     parser.add_argument("--batch-name", default=None, help="批次目录名（默认按日期生成）")
     parser.add_argument("--server", default="http://127.0.0.1:8188", help="ComfyUI API 地址")
     parser.add_argument("--timeout", type=int, default=1800, help="单条任务超时时间（秒）")
@@ -117,6 +118,7 @@ def main() -> int:
     out_dir = Path(args.output_dir)
     manifest_path = out_dir / batch_name / "manifest.jsonl"
     workflows_dir = Path(args.workflows_dir)
+    shared_workflows_dir = Path(args.shared_workflows_dir) if args.shared_workflows_dir else None
 
     wait_server_ready(args.server)
     completed = load_completed_ids(manifest_path)
@@ -139,6 +141,10 @@ def main() -> int:
 
         wf_name = (row.get("workflow") or "").strip()
         wf_path = workflows_dir / wf_name
+        if not wf_path.exists() and shared_workflows_dir:
+            shared_candidate = shared_workflows_dir / wf_name
+            if shared_candidate.exists():
+                wf_path = shared_candidate
         if not wf_path.exists():
             print(f"[{idx}/{total}] [失败] 找不到工作流模板: {wf_path}")
             append_manifest(manifest_path, {

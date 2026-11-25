@@ -17,28 +17,61 @@ from pathlib import Path
 from typing import Any
 
 
-DRIVE_SUBDIRS = [
-    "models/diffusion_models",
-    "models/text_encoders",
-    "models/vae",
-    "models/loras",
-    "models/upscale_models",
-    "models/latent_upscale_models",
-    "models/clip_vision",
+DRIVE_SHARED_SUBDIRS = [
+    "shared/models/diffusion_models",
+    "shared/models/text_encoders",
+    "shared/models/vae",
+    "shared/models/loras",
+    "shared/models/upscale_models",
+    "shared/models/latent_upscale_models",
+    "shared/models/clip_vision",
+    "shared/workflows",
+    "shared/logs",
+    "projects",
+]
+
+PROJECT_SUBDIRS = [
     "inputs",
-    "tasks",
     "workflows",
     "outputs",
-    "cache",
     "logs",
 ]
 
 
-def ensure_drive_layout(drive_root: Path) -> None:
-    """初始化 5TB Google Drive 标准目录结构。"""
-    for rel in DRIVE_SUBDIRS:
+def ensure_drive_layout(drive_root: Path, repo_root: Path | None = None, project_id: str | None = None) -> None:
+    """初始化 5TB Google Drive 全局共享层与独立项目文件夹，并将仓库中的剧本/任务表同步上云。"""
+    for rel in DRIVE_SHARED_SUBDIRS:
         (drive_root / rel).mkdir(parents=True, exist_ok=True)
-    print(f"[目录就绪] {drive_root}")
+    print(f"[云端共享层就绪] {drive_root / 'shared'}")
+
+    # 将仓库中所有 projects/* 同步初始化到 5TB 云盘对应项目目录（不覆盖用户在云盘修改过的同名文件）
+    projects_to_init: list[str] = []
+    if repo_root and (repo_root / "projects").exists():
+        for p in sorted((repo_root / "projects").iterdir()):
+            if p.is_dir():
+                projects_to_init.append(p.name)
+    if project_id and project_id not in projects_to_init:
+        projects_to_init.append(project_id)
+
+    for pid in projects_to_init:
+        cloud_pdir = drive_root / "projects" / pid
+        for sub in PROJECT_SUBDIRS:
+            (cloud_pdir / sub).mkdir(parents=True, exist_ok=True)
+        if repo_root:
+            src_pdir = repo_root / "projects" / pid
+            if src_pdir.exists():
+                for fname in ("project.json", "script.md", "tasks.csv"):
+                    src_file = src_pdir / fname
+                    dst_file = cloud_pdir / fname
+                    if src_file.exists() and not dst_file.exists():
+                        shutil.copy2(src_file, dst_file)
+                src_wf = src_pdir / "workflows"
+                if src_wf.exists():
+                    for wf in src_wf.glob("*.json"):
+                        dst_wf = cloud_pdir / "workflows" / wf.name
+                        if not dst_wf.exists():
+                            shutil.copy2(wf, dst_wf)
+        print(f"[云端项目就绪] {cloud_pdir}")
 
 
 def resolve_repo_path(
@@ -134,9 +167,11 @@ def download_file_to_drive(
 def main() -> int:
     parser = argparse.ArgumentParser(description="将开源视频模型包同步到 Google Drive 5TB")
     parser.add_argument("--manifest", default="configs/models_manifest.json", help="模型清单路径")
+    parser.add_argument("--repo-root", default=".", help="AI-Video 仓库根目录（用于同步 projects/ 剧本上云）")
+    parser.add_argument("--project", default="01_rainy_signal", help="同步初始化的项目 ID")
     parser.add_argument("--drive-root", default=None, help="Google Drive 项目根目录")
     parser.add_argument("--packs", nargs="+", required=True, help="要同步的模型包 ID 列表，或传 all")
-    parser.add_argument("--hf-token", default=os.environ.get("HF_TOKEN"), help="Hugging Face Token（下载受限模型如 LTX-2.5 时需要）")
+    parser.add_argument("--hf-token", default=os.environ.get("HF_TOKEN"), help="Hugging Face Token（下载受限模型时需要）")
     parser.add_argument("--force", action="store_true", help="强制重新下载覆盖已有文件")
     parser.add_argument("--list", action="store_true", help="仅列出所有可用模型包")
     args = parser.parse_args()
@@ -153,8 +188,8 @@ def main() -> int:
         return 0
 
     drive_root = Path(args.drive_root or manifest["drive_root_default"])
-    ensure_drive_layout(drive_root)
-    drive_models_root = drive_root / "models"
+    ensure_drive_layout(drive_root, repo_root=Path(args.repo_root).resolve(), project_id=args.project)
+    drive_models_root = drive_root / "shared" / "models"
 
     selected = list(packs_cfg.keys()) if "all" in args.packs else args.packs
     for pid in selected:

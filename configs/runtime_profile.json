@@ -3,6 +3,8 @@
   "project_name": "AI-Video",
   "git_repo": "https://github.com/WSQ233/AI-Video.git",
   "drive_root": "/content/drive/MyDrive/AI_Video",
+  "shared_subdir": "shared",
+  "default_project": "01_rainy_signal",
   "comfyui_dir": "/content/ComfyUI",
   "default_packs": [
     "minimax_h3_fl2va_bf16",

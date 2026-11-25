@@ -1,27 +1,38 @@
-# AI-Video（全云端：Colab A100 80GB + 5TB Google Drive · MiniMax H3 满血生产线）
+# AI-Video（全云端按项目隔离：Colab A100 80GB + 5TB Google Drive · MiniMax H3 33.1B）
 
-**100% 纯云端架构**：代码托管在 GitHub，所有 33.1B 无损模型权重、素材、工作流与成品视频全部存储在 **Google AI Pro 5TB Google Drive (`/MyDrive/AI_Video/`)**，本地硬盘零占用。
+**100% 纯云端架构**：代码与轻量化剧本配置托管在 GitHub，所有 33.1B 模型权重、参考素材、工作流与成品视频全部存储在 **5TB Google Drive (`/MyDrive/AI_Video/`)**，**每个剧本独立一个项目文件夹**，所有所属资源严格归拢在各自项目目录下。
 
 ## 一键在 Colab 打开
 
 | Notebook | 用途 | 推荐运行时 | 一键打开 |
 | :--- | :--- | :--- | :--- |
-| `00_sync_models_to_drive.ipynb` | 云对云拉取 MiniMax H3 33.1B 无损模型进 5TB Drive（纯网络 I/O，不浪费 GPU CU） | **免费 CPU（0 CU）** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/WSQ233/AI-Video/blob/main/notebooks/00_sync_models_to_drive.ipynb) |
-| `01_h100_comfyui_webui.ipynb` | **调用 A100 80GB 计算单元** 启动 ComfyUI WebUI（Cloudflare 隧道），调试并导出 API 工作流 | **A100 80GB** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/WSQ233/AI-Video/blob/main/notebooks/01_h100_comfyui_webui.ipynb) |
-| `02_h100_batch_runner.ipynb` | **调用 A100 80GB 计算单元** 无头批量出片（CSV 驱动 + 断点续传 + 跑完自动释放防烧卡） | **A100 80GB** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/WSQ233/AI-Video/blob/main/notebooks/02_h100_batch_runner.ipynb) |
+| `00_sync_models_to_drive.ipynb` | 云对云拉取 MiniMax H3 33.1B 共享模型 + 初始化云端项目文件夹 | **免费 CPU（0 CU）** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/WSQ233/AI-Video/blob/main/notebooks/00_sync_models_to_drive.ipynb) |
+| `01_h100_comfyui_webui.ipynb` | 调用 **A100 80GB** 挂载指定 `PROJECT_ID` 启动 ComfyUI WebUI 调试 | **A100 80GB** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/WSQ233/AI-Video/blob/main/notebooks/01_h100_comfyui_webui.ipynb) |
+| `02_h100_batch_runner.ipynb` | 调用 **A100 80GB** 按 `PROJECT_ID` 无头批量出片 + 断点续传 + 自动关机 | **A100 80GB** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/WSQ233/AI-Video/blob/main/notebooks/02_h100_batch_runner.ipynb) |
 
 ---
 
-## Colab A100 80GB 满血高配清单（`configs/models_manifest.json`）
+## 5TB Google Drive 云端目录结构（全局共享层 + 独立项目层）
 
-| Pack ID | 说明 | 体积 | 定位 |
-| :--- | :--- | :--- | :--- |
-| **`minimax_h3_fl2va_bf16`** ⭐ | **MiniMax H3 FL2VA 33.1B 完整未剪枝无损 BF16** (`61.7GB`) + Qwen3-VL-32B INT8-ConvRot (`27GB`) + FP16 视频 VAE + FP32 音频 VAE | ~95 GB | **画质与物理细节天花板**（首尾帧/图生/文生 + 32kHz 立体声） |
-| **`minimax_h3_ref2va_bf16`** ⭐ | **MiniMax H3 Ref2VA 33.1B 完整未剪枝无损 BF16**（复用编码器与双 VAE） | ~62 GB 增量 | **多图/视频/音频全能参考天花板** |
-| **`minimax_h3_turbo_lora`** ⭐ | **MiniMax H3 Turbo 极速加速 LoRA** | ~2 GB | 4~8 步极速出片，大幅省 A100 计算单元 |
-| `minimax_h3_fl2va_int8_full` | 33.1B 完整未剪枝 `int8_convrot` (`~31.7GB`) | ~32 GB | 跑 15s 超长高分辨率视频需要超大显存余量时切换 |
-| `minimax_h3_ref2va_int8_full` | 33.1B 完整未剪枝 `int8_convrot` (`~31.7GB`) | ~32 GB | 多参考超长视频高显存余量备选 |
-| `qwen3vl_bf16_optional` | Qwen3-VL-32B 完整无损 BF16 (`~65GB`) | ~65 GB | 追求 100% 全链路 BF16 时可选 |
-| `flux2_keyframe` | FLUX.2 [dev] FP8 Mixed 首帧生图（可选） | ~45 GB | 需要先独立生图定首帧时可选 |
+```text
+/MyDrive/AI_Video/
+├── shared/                              # 全局共享层（跨所有项目复用）
+│   ├── models/                          # MiniMax H3 33.1B BF16 / Qwen3-VL / 双VAE / LoRA
+│   ├── workflows/                       # 通用 ComfyUI 工作流模板
+│   └── logs/                            # 系统版本锁定备份等
+└── projects/                            # 每个剧本/测试短片独立一个项目文件夹！
+    └── 01_rainy_signal/                 # 测试项目 01：《雨夜信号 / Rainy Signal》
+        ├── project.json                 # 项目元信息
+        ├── script.md                    # 剧本与分镜说明
+        ├── tasks.csv                    # 本项目分镜批处理任务表
+        ├── inputs/                      # 本项目专属素材（参考图 ref_linwan.png / 音视频）
+        ├── workflows/                   # 本项目专属工作流 JSON（优先于 shared/workflows）
+        ├── outputs/                     # 本项目生成的分镜视频 + manifest.jsonl
+        └── logs/                        # 本项目运行日志
+```
 
-> **A100 80GB 显存调优**：`runtime_profile.json` 为 `A100_80GB` 启用 `--normalvram --bf16-vae`——Qwen3-VL-32B 编码完成后立刻自动卸载，腾出完整 80GB HBM2e 给 **61.7GB 的 33.1B 无损 BF16** 独占推理；且每次启动只把当前要跑的单个主模型（如 `minimax_h3_fl2va_bf16`，~95GB）从 5TB Drive 拷入 Colab 本地 NVMe SSD（~235GB 空间游刃有余），其余模型通过 `extra_model_paths.yaml` 随时可从 Drive 切换。
+### 新建下一个剧本/短片项目
+```bash
+python scripts/new_project.py 02_cyber_chase "赛博追逐"
+```
+推送到 GitHub 后，在 Colab 里把 `PROJECT_ID` 改成 `02_cyber_chase`，所有输入输出会自动隔离切到 `/MyDrive/AI_Video/projects/02_cyber_chase/`。
