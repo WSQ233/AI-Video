@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -147,15 +148,50 @@ def download_file_to_drive(
         token=token,
     )
 
-    print(f"  [开始下载] {repo_id} :: {repo_path}")
+    print(f"  [开始下载] {repo_id} :: {repo_path}", flush=True)
     t0 = time.time()
+    hf_url = f"https://huggingface.co/{repo_id}/resolve/main/{repo_path}"
+    has_aria2 = shutil.which("aria2c") is not None
+
     with tempfile.TemporaryDirectory(prefix="hf_dl_") as tmp_dir:
-        local_cached = hf_hub_download(
-            repo_id=repo_id,
-            filename=repo_path,
-            local_dir=tmp_dir,
-            token=token,
-        )
+        tmp_local = Path(tmp_dir) / entry["filename"]
+        used_aria2 = False
+        if has_aria2:
+            aria_cmd = [
+                "aria2c",
+                "-x", "16",
+                "-s", "16",
+                "-k", "10M",
+                "--console-log-level=error",
+                "--summary-interval=0",
+                "--allow-overwrite=true",
+                "--auto-file-renaming=false",
+                "-d", str(tmp_dir),
+                "-o", entry["filename"],
+            ]
+            if token:
+                aria_cmd.extend(["--header", f"Authorization: Bearer {token}"])
+            aria_cmd.append(hf_url)
+            res = subprocess.run(aria_cmd)
+            if res.returncode == 0 and tmp_local.exists() and tmp_local.stat().st_size > 1024 * 1024:
+                local_cached = str(tmp_local)
+                used_aria2 = True
+            else:
+                print("  [回退] aria2c 下载未完成，切换 hf_hub_download...", flush=True)
+
+        if not used_aria2:
+            local_cached = hf_hub_download(
+                repo_id=repo_id,
+                filename=repo_path,
+                local_dir=tmp_dir,
+                token=token,
+            )
+
+        dl_elapsed = time.time() - t0
+        size_gb = Path(local_cached).stat().st_size / (1024 ** 3)
+        dl_speed = (Path(local_cached).stat().st_size / (1024 ** 2)) / max(dl_elapsed, 0.1)
+        print(f"  [下载完成 -> 正在写入5TB云盘] {entry['filename']} ({size_gb:.2f} GB, 下载耗时 {dl_elapsed:.1f}s, ~{dl_speed:.1f} MB/s)", flush=True)
+
         # 先落临时文件再原子替换，避免中断在网盘留下损坏文件
         tmp_drive_path = final_path.with_suffix(final_path.suffix + ".part")
         if tmp_drive_path.exists():
@@ -164,9 +200,8 @@ def download_file_to_drive(
         os.replace(tmp_drive_path, final_path)
 
     elapsed = time.time() - t0
-    size_gb = final_path.stat().st_size / (1024 ** 3)
     speed_mb = (final_path.stat().st_size / (1024 ** 2)) / max(elapsed, 0.1)
-    print(f"  [同步完成] {final_path} ({size_gb:.2f} GB, 耗时 {elapsed:.1f}s, ~{speed_mb:.1f} MB/s)")
+    print(f"  [同步完成] {final_path} ({size_gb:.2f} GB, 总耗时 {elapsed:.1f}s, 综合 ~{speed_mb:.1f} MB/s)", flush=True)
 
 
 def main() -> int:
