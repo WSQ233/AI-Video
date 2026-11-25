@@ -39,9 +39,14 @@ PROJECT_SUBDIRS = [
 
 
 def ensure_drive_layout(drive_root: Path, repo_root: Path | None = None, project_id: str | None = None) -> None:
-    """初始化 5TB Google Drive 全局共享层与独立项目文件夹，并将仓库中的剧本/任务表同步上云。"""
+    """初始化 5TB Google Drive 全局共享层与独立项目文件夹，并将仓库中的共享工作流与剧本/任务表同步上云。"""
     for rel in DRIVE_SHARED_SUBDIRS:
         (drive_root / rel).mkdir(parents=True, exist_ok=True)
+    if repo_root and (repo_root / "workflows" / "shared").exists():
+        for wf in (repo_root / "workflows" / "shared").glob("*.json"):
+            dst = drive_root / "shared" / "workflows" / wf.name
+            if not dst.exists():
+                shutil.copy2(wf, dst)
     print(f"[云端共享层就绪] {drive_root / 'shared'}")
 
     # 将仓库中所有 projects/* 同步初始化到 5TB 云盘对应项目目录（不覆盖用户在云盘修改过的同名文件）

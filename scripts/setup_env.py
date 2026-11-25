@@ -165,10 +165,18 @@ def write_extra_model_paths(comfy_dir: Path, shared_models_dir: Path) -> None:
     (comfy_dir / "extra_model_paths.yaml").write_text(yaml_content, encoding="utf-8")
 
 
-def sync_project_files_to_drive(repo_root: Path, project_dir: Path, project_id: str) -> None:
-    """确保独立项目云端目录存在，并将仓库中的剧本/任务表同步到该项目目录（不覆盖云盘已有修改）。"""
+def sync_project_files_to_drive(repo_root: Path, shared_dir: Path, project_dir: Path, project_id: str) -> None:
+    """确保共享模板与独立项目云端目录存在，并将仓库中的工作流/剧本/任务表同步到云端（不覆盖已有修改）。"""
+    (shared_dir / "workflows").mkdir(parents=True, exist_ok=True)
+    (shared_dir / "logs").mkdir(parents=True, exist_ok=True)
     for sub in ("inputs", "workflows", "outputs", "logs"):
         (project_dir / sub).mkdir(parents=True, exist_ok=True)
+    repo_shared_wf = repo_root / "workflows" / "shared"
+    if repo_shared_wf.exists():
+        for wf in repo_shared_wf.glob("*.json"):
+            for target_wf in (shared_dir / "workflows" / wf.name, project_dir / "workflows" / wf.name):
+                if not target_wf.exists():
+                    shutil.copy2(wf, target_wf)
     src_pdir = repo_root / "projects" / project_id
     if src_pdir.exists():
         for fname in ("project.json", "script.md", "tasks.csv"):
@@ -246,9 +254,7 @@ def main() -> int:
 
     # 4. 初始化独立项目云端目录并软链接直连 ComfyUI（输入/输出严格隔离到当前项目下！）
     print(f"\n[项目云端绑定] 将 ComfyUI 挂载到独立项目: {project_dir}")
-    sync_project_files_to_drive(repo_root, project_dir, project_id)
-    (shared_dir / "workflows").mkdir(parents=True, exist_ok=True)
-    (shared_dir / "logs").mkdir(parents=True, exist_ok=True)
+    sync_project_files_to_drive(repo_root, shared_dir, project_dir, project_id)
     ensure_symlink(comfy_dir / "input", project_dir / "inputs")
     ensure_symlink(comfy_dir / "output", project_dir / "outputs")
     ensure_symlink(comfy_dir / "user" / "default" / "workflows", project_dir / "workflows")

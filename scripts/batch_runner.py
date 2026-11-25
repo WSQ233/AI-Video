@@ -164,10 +164,10 @@ def main() -> int:
             "__NEGATIVE_PROMPT__": row.get("negative_prompt", ""),
             "__IMAGE__": row.get("image", ""),
             "__SEED__": seed,
-            "__WIDTH__": int(row["width"]) if (row.get("width") or "").strip().isdigit() else 1280,
-            "__HEIGHT__": int(row["height"]) if (row.get("height") or "").strip().isdigit() else 720,
-            "__FRAMES__": int(row["frames"]) if (row.get("frames") or "").strip().isdigit() else 81,
-            "__FPS__": int(row["fps"]) if (row.get("fps") or "").strip().isdigit() else 16,
+            "__WIDTH__": int(row["width"]) if (row.get("width") or "").strip().isdigit() else 1344,
+            "__HEIGHT__": int(row["height"]) if (row.get("height") or "").strip().isdigit() else 768,
+            "__FRAMES__": int(row["frames"]) if (row.get("frames") or "").strip().isdigit() else 124,
+            "__FPS__": int(row["fps"]) if (row.get("fps") or "").strip().isdigit() else 24,
             "__OUTPUT_PREFIX__": f"{batch_name}/{task_id}",
         }
 
