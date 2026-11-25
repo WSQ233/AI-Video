@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Large media & model weights (never commit to git — store in 5TB Google Drive!)
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.gguf
+*.onnx
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.wav
+*.mp3
+*.flac
+*.zip
+*.tar
+*.tar.gz
+
+# Local scratch & secrets
+.env
+*.secret
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+logs/
+outputs/
+tmp/

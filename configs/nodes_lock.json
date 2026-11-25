@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "notes": "首次在 Colab 跑通并验证无报错后，运行 scripts/freeze_locks.py 将当前稳定的 git commit 写回本文件，实现 100% 可复现启动。",
+  "comfyui": {
+    "repo": "https://github.com/comfyanonymous/ComfyUI.git",
+    "commit": "HEAD"
+  },
+  "custom_nodes": [
+    {
+      "name": "ComfyUI-Manager",
+      "repo": "https://github.com/ltdrdata/ComfyUI-Manager.git",
+      "commit": "HEAD",
+      "enabled": true,
+      "purpose": "节点管理与模板浏览"
+    },
+    {
+      "name": "ComfyUI-VideoHelperSuite",
+      "repo": "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git",
+      "commit": "HEAD",
+      "enabled": true,
+      "purpose": "视频编码导出 (H.264/H.265/MP4)、帧序列读写与音轨合并"
+    },
+    {
+      "name": "ComfyUI-KJNodes",
+      "repo": "https://github.com/kijai/ComfyUI-KJNodes.git",
+      "commit": "HEAD",
+      "enabled": true,
+      "purpose": "Wan/LTX 工作流常用分辨率、调度、显存清理与工具节点"
+    },
+    {
+      "name": "ComfyUI-WanVideoWrapper",
+      "repo": "https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
+      "commit": "HEAD",
+      "enabled": true,
+      "purpose": "Wan 2.2 高级特性封装（LightX2V LoRA / SageAttention / TeaCache 等）"
+    },
+    {
+      "name": "ComfyUI-LTXVideo",
+      "repo": "https://github.com/Lightricks/ComfyUI-LTXVideo.git",
+      "commit": "HEAD",
+      "enabled": false,
+      "purpose": "启用 ltx25_av 包时将 enabled 改为 true"
+    }
+  ]
+}

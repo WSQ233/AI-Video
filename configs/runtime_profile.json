@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "project_name": "AI-Video",
+  "git_repo": "https://github.com/WSQ233/AI-Video.git",
+  "drive_root": "/content/drive/MyDrive/AI_Video",
+  "comfyui_dir": "/content/ComfyUI",
+  "default_packs": [
+    "wan22_i2v_fp16",
+    "wan22_lightx2v_lora"
+  ],
+  "model_load_mode": "copy_to_local",
+  "copy_workers": 4,
+  "gpu_profiles": {
+    "H100": {
+      "comfyui_args": "--highvram --bf16-unet --bf16-vae --bf16-text-enc --listen 127.0.0.1 --port 8188",
+      "install_sageattention": false,
+      "note": "H100 默认启用 PyTorch 原生 FlashAttention (SDPA) 保障零噪点稳定运行；确认跑通后可将 install_sageattention 设为 true 进一步提速。"
+    },
+    "A100": {
+      "comfyui_args": "--highvram --bf16-unet --bf16-vae --listen 127.0.0.1 --port 8188",
+      "install_sageattention": false,
+      "note": "A100 40GB/80GB 兼容配置"
+    },
+    "L4": {
+      "comfyui_args": "--normalvram --fp8_e4m3fn-unet --listen 127.0.0.1 --port 8188",
+      "install_sageattention": false,
+      "note": "L4 24GB 建议使用 wan22_i2v_fp8 模型包"
+    },
+    "DEFAULT": {
+      "comfyui_args": "--normalvram --listen 127.0.0.1 --port 8188",
+      "install_sageattention": false,
+      "note": "通用兜底配置"
+    }
+  }
+}

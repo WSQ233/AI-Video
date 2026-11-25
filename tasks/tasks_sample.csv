@@ -1,0 +1,3 @@
+task_id,workflow,prompt,negative_prompt,image,seed,width,height,frames,fps
+demo_001,wan22_i2v_api.json,"Cinematic slow push-in shot, gentle wind blowing through hair, soft golden hour sunlight, natural realistic motion, 4k film grain","blurry, distorted face, jitter, watermark, low quality",sample_keyframe.png,42,1280,720,81,16
+demo_002,wan22_i2v_api.json,"Smooth orbit camera movement around the subject, subtle atmospheric dust particles floating in studio rim light, crisp details","flicker, artifacts, deformed hands, static frame",sample_keyframe.png,1024,1280,720,81,16
