@@ -41,8 +41,15 @@ def ensure_drive_layout(drive_root: Path) -> None:
     print(f"[目录就绪] {drive_root}")
 
 
-def resolve_repo_path(api: Any, repo_id: str, preferred_path: str, fallback_keywords: list[str], token: str | None) -> str:
-    """优先使用配置中的精确路径；若上游目录微调，则按关键词自动匹配。"""
+def resolve_repo_path(
+    api: Any,
+    repo_id: str,
+    preferred_path: str,
+    fallback_keywords: list[str],
+    exclude_keywords: list[str],
+    token: str | None,
+) -> str:
+    """优先使用配置中的精确路径；若上游目录微调，则按关键词自动匹配并排除指定词（如 pruned）。"""
     try:
         files = api.list_repo_files(repo_id=repo_id, token=token)
     except Exception as exc:
@@ -54,9 +61,11 @@ def resolve_repo_path(api: Any, repo_id: str, preferred_path: str, fallback_keyw
 
     if fallback_keywords:
         lowered = [kw.lower() for kw in fallback_keywords]
+        excluded = [kw.lower() for kw in exclude_keywords]
         candidates = [
             f for f in files
             if all(kw in f.lower() for kw in lowered)
+            and not any(ex in f.lower() for ex in excluded)
         ]
         if len(candidates) == 1:
             print(f"  [自动修正路径] {preferred_path} -> {candidates[0]}")
@@ -96,6 +105,7 @@ def download_file_to_drive(
         repo_id=repo_id,
         preferred_path=entry["repo_path"],
         fallback_keywords=entry.get("fallback_keywords", []),
+        exclude_keywords=entry.get("exclude_keywords", []),
         token=token,
     )
 
