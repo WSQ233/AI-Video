@@ -1,0 +1,24 @@
+{
+  "colab-comfyui-skill-sync": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "edit_file|write_file|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -I -X utf8 hooks/sync_colab_comfyui_skill.py --hook",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python -I -X utf8 hooks/sync_colab_comfyui_skill.py --hook",
+        "timeout": 15
+      }
+    ]
+  }
+}

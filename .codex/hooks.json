@@ -1,0 +1,18 @@
+{
+  "description": "当 Colab / ComfyUI 流程脚本、配置、Notebook 或工作流模板变更时，自动同步更新项目级 colab-comfyui-control Skill",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I -X utf8 -c \"import runpy; from pathlib import Path; cwd=Path.cwd(); path=next(d/'.agents/hooks/sync_colab_comfyui_skill.py' for d in (cwd,*cwd.parents) if (d/'.agents/hooks/sync_colab_comfyui_skill.py').is_file()); runpy.run_path(str(path),run_name='__main__')\" --hook",
+            "commandWindows": "python -I -X utf8 -c \"import runpy; from pathlib import Path; cwd=Path.cwd(); path=next(d/'.agents/hooks/sync_colab_comfyui_skill.py' for d in (cwd,*cwd.parents) if (d/'.agents/hooks/sync_colab_comfyui_skill.py').is_file()); runpy.run_path(str(path),run_name='__main__')\" --hook",
+            "timeout": 20,
+            "statusMessage": "同步 Colab 与 ComfyUI 控制 Skill 基线"
+          }
+        ]
+      }
+    ]
+  }
+}
