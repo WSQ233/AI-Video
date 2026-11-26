@@ -44,10 +44,10 @@ CHARACTER_SOURCES: dict[str, dict[str, Any]] = {
         "files": [
             "File:Jensen huang stanford 2026-04-30 008 (cropped).jpg",
             "File:Jensen Huang (cropped) (2024).jpg",
-            "File:Jensen Huang Nvidia Keynote CES 2025.jpg",
-            "File:Jensen huang stanford 2026-04-09 034.jpg",
+            "File:Jensen Huang Stanford 2026-04-30 010 (cropped).jpg",
+            "File:Jensen Huang 20231109 (cropped2).jpg",
         ],
-        "search_queries": ["Jensen Huang Nvidia", "Jensen Huang 2025"],
+        "search_queries": ["Jensen Huang cropped", "Jensen Huang portrait"],
         "target_count": 3,
     },
     "scott_bessent": {
@@ -55,8 +55,8 @@ CHARACTER_SOURCES: dict[str, dict[str, Any]] = {
         "mode": "multi_angle",
         "files": [
             "File:Official portrait of Treasury Secretary Scott Bessent (borderless).jpg",
-            "File:Official portrait of Treasury Secretary Scott Bessent (cropped).jpg",
-            "File:Official portrait of Treasury Secretary Scott Bessent.jpg",
+            "File:Scott Bessent.jpg",
+            "File:Scott Bessent, official portrait (2025).jpg",
         ],
         "search_queries": ["Scott Bessent 2025", "Scott Bessent Treasury"],
         "target_count": 3,
@@ -66,10 +66,10 @@ CHARACTER_SOURCES: dict[str, dict[str, Any]] = {
         "mode": "multi_angle",
         "files": [
             "File:Official portrait of Secretary Marco Rubio.jpg",
-            "File:Secretary of State Marco Rubio Official Portrait.jpg",
-            "File:Official portrait of Secretary Marco Rubio, January 2025.jpg",
+            "File:Senator Rubio official portrait.jpg",
+            "File:Marco Rubio, Official Portrait, 112th Congress.jpg",
         ],
-        "search_queries": ["Marco Rubio 2025", "Marco Rubio Secretary of State"],
+        "search_queries": ["Marco Rubio speaking cropped", "Marco Rubio portrait"],
         "target_count": 3,
     },
     "jd_vance": {
@@ -77,9 +77,11 @@ CHARACTER_SOURCES: dict[str, dict[str, Any]] = {
         "mode": "multi_angle",
         "files": [
             "File:January 2025 Official Vice Presidential Portrait of JD Vance.jpg",
-            "File:JD Vance official portrait (118th Congress).jpg",
+            "File:Senator Vance official portrait. 118th Congress (cropped).jpg",
+            "File:J. D. Vance (53984614485) (cropped).jpg",
+            "File:J. D. Vance (53809627400) (cropped).jpg",
         ],
-        "search_queries": ["JD Vance 2025", "JD Vance Vice President"],
+        "search_queries": ["JD Vance cropped", "JD Vance official portrait"],
         "target_count": 3,
     },
     "democrats": {
