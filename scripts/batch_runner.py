@@ -16,6 +16,7 @@ import argparse
 import csv
 import json
 import random
+import shutil
 import time
 import urllib.error
 import urllib.request
@@ -72,30 +73,27 @@ def resolve_project_image(image_ref: str, project_dir: Path, comfy_input_dir: Pa
     for rel_path, full_path in candidates:
         if full_path.is_file():
             if comfy_input_dir and comfy_input_dir.is_dir():
-                # ComfyUI 原生 LoadImage 校验仅枚举 input/ 顶层文件，优先返回指向同一文件的平铺文件名
-                flat_link = comfy_input_dir / fname
-                if flat_link.exists() or flat_link.is_symlink():
-                    try:
-                        if flat_link.resolve() == full_path.resolve():
-                            return fname
-                    except Exception:
-                        pass
-                else:
-                    try:
-                        flat_link.symlink_to(full_path)
-                        return fname
-                    except Exception:
-                        pass
-                # 若根目录已有同名不同文件，则创建唯一扁平化软链接避免 LoadImage 路径校验报错
+                # ComfyUI 0.46+ LoadImage 校验仅枚举 input/ 顶层真实文件（拒绝指向目录外的软链）
+                # 因此直接将参考图/素材拷贝为 input/ 顶层的真实本地文件，同时规避 DriveFS 读延迟
+                flat_dest = comfy_input_dir / fname
+                try:
+                    if flat_dest.is_symlink():
+                        flat_dest.unlink()
+                    if not flat_dest.exists() or flat_dest.stat().st_size != full_path.stat().st_size:
+                        shutil.copy2(full_path, flat_dest)
+                    return fname
+                except Exception:
+                    pass
                 unique_flat = rel_path.replace("/", "__")
-                unique_link = comfy_input_dir / unique_flat
-                if not unique_link.exists() and not unique_link.is_symlink():
-                    try:
-                        unique_link.symlink_to(full_path)
-                    except Exception:
-                        pass
-                if unique_link.exists():
+                unique_dest = comfy_input_dir / unique_flat
+                try:
+                    if unique_dest.is_symlink():
+                        unique_dest.unlink()
+                    if not unique_dest.exists() or unique_dest.stat().st_size != full_path.stat().st_size:
+                        shutil.copy2(full_path, unique_dest)
                     return unique_flat
+                except Exception:
+                    pass
                 target_in_comfy = comfy_input_dir / rel_path
                 if target_in_comfy.is_file():
                     return rel_path
