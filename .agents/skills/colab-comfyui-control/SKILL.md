@@ -97,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state 97d5949d89a16c796c2bfbc423deea241ec8eb9773a4d2c127a37b7cbb288cfc -->
+<!-- pipeline-baseline:state 964914a0de23187fa77a1fd05d2c5df04b673f9623ddb7f8faa98a9cc6204518 -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 

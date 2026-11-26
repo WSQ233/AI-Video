@@ -72,17 +72,33 @@ def resolve_project_image(image_ref: str, project_dir: Path, comfy_input_dir: Pa
     for rel_path, full_path in candidates:
         if full_path.is_file():
             if comfy_input_dir and comfy_input_dir.is_dir():
+                # ComfyUI 原生 LoadImage 校验仅枚举 input/ 顶层文件，优先返回指向同一文件的平铺文件名
+                flat_link = comfy_input_dir / fname
+                if flat_link.exists() or flat_link.is_symlink():
+                    try:
+                        if flat_link.resolve() == full_path.resolve():
+                            return fname
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        flat_link.symlink_to(full_path)
+                        return fname
+                    except Exception:
+                        pass
+                # 若根目录已有同名不同文件，则创建唯一扁平化软链接避免 LoadImage 路径校验报错
+                unique_flat = rel_path.replace("/", "__")
+                unique_link = comfy_input_dir / unique_flat
+                if not unique_link.exists() and not unique_link.is_symlink():
+                    try:
+                        unique_link.symlink_to(full_path)
+                    except Exception:
+                        pass
+                if unique_link.exists():
+                    return unique_flat
                 target_in_comfy = comfy_input_dir / rel_path
                 if target_in_comfy.is_file():
                     return rel_path
-                flat_link = comfy_input_dir / fname
-                if not flat_link.exists():
-                    try:
-                        flat_link.symlink_to(full_path)
-                    except Exception:
-                        pass
-                if flat_link.exists():
-                    return fname
             return rel_path
     return clean
 
