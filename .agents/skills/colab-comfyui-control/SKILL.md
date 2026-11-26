@@ -97,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state 964914a0de23187fa77a1fd05d2c5df04b673f9623ddb7f8faa98a9cc6204518 -->
+<!-- pipeline-baseline:state c34df44649ecb565271e9ea8ca8cb8c71d1ae8bc9ea0b50b68a73e3224e8b08e -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 
@@ -133,9 +133,9 @@ description: >-
 
 | Notebook 文件 | 标题与职责 | 暴露表单参数 (`#@param`) |
 | :--- | :--- | :--- |
-| `notebooks/00_sync_models_to_drive.ipynb` | 00 · 纯云端高速同步 MiniMax H3 满血模型 + 初始化独立项目目录到 5TB Google Drive | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `MINIMAX_H3_FL2VA_BF16_FULL=True`, `MINIMAX_H3_REF2VA_BF16_FULL=False`, `MINIMAX_H3_TURBO_LORA=True`, `MINIMAX_H3_FL2VA_INT8_FULL=False`, `MINIMAX_H3_REF2VA_INT8_FULL=False`, `QWEN3VL_BF16_OPTIONAL=False`, `TRANSFER_MODE="auto"`, `FILE_WORKERS=2`, `FETCH_WORKERS=8`, `UPLOAD_CHUNK_MB=64`, `FORCE_REDOWNLOAD=False`, `HF_TOKEN_INPUT=""` |
-| `notebooks/01_h100_comfyui_webui.ipynb` | 01 · Colab A100 80GB 启动 ComfyUI WebUI（按独立项目挂载云端资产） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=8`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False` |
-| `notebooks/02_h100_batch_runner.ipynb` | 02 · Colab A100 80GB 无头批处理量产（按独立项目隔离 + Drive API 极速预热 + 自动关机防烧卡） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=8`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False`, `BATCH_NAME=""`, `AUTO_DISCONNECT=True` |
+| `notebooks/00_sync_models_to_drive.ipynb` | 00 · 纯云端高速同步 MiniMax H3 满血模型 + 初始化独立项目目录到 5TB Google Drive | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `MINIMAX_H3_FL2VA_BF16_FULL=True`, `MINIMAX_H3_REF2VA_BF16_FULL=False`, `MINIMAX_H3_TURBO_LORA=True`, `MINIMAX_H3_FL2VA_INT8_FULL=False`, `MINIMAX_H3_REF2VA_INT8_FULL=False`, `QWEN3VL_BF16_OPTIONAL=False`, `TRANSFER_MODE="auto"`, `FILE_WORKERS=3`, `FETCH_WORKERS=8`, `UPLOAD_CHUNK_MB=256`, `FORCE_REDOWNLOAD=False`, `HF_TOKEN_INPUT=""` |
+| `notebooks/01_h100_comfyui_webui.ipynb` | 01 · Colab A100 80GB 启动 ComfyUI WebUI（按独立项目挂载云端资产） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=16`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False` |
+| `notebooks/02_h100_batch_runner.ipynb` | 02 · Colab A100 80GB 无头批处理量产（按独立项目隔离 + Drive API 极速预热 + 自动关机防烧卡） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=16`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False`, `BATCH_NAME=""`, `AUTO_DISCONNECT=True` |
 
 ### 6.5 控制脚本与 CLI 参数 (`scripts/*.py`)
 

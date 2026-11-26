@@ -364,7 +364,7 @@ def main() -> int:
         default="auto",
         help="传输引擎：auto(优先 Drive API 零落盘直传，失败自动回退 DriveFS) / drive_api / drivefs",
     )
-    parser.add_argument("--file-workers", type=int, default=2, help="Drive API 模式下并发直传的文件数量（默认 2）")
+    parser.add_argument("--file-workers", type=int, default=3, help="Drive API 模式下并发直传的文件数量（默认 3，实测聚合吞吐 2.5x+）")
     parser.add_argument(
         "--fetch-workers",
         type=int,
@@ -375,7 +375,7 @@ def main() -> int:
         "--upload-chunk-mb",
         type=int,
         default=DEFAULT_UPLOAD_CHUNK_MB,
-        help="Google Drive Resumable Upload 单块大小 MiB（默认 64）",
+        help="Google Drive Resumable Upload 单块大小 MiB（默认 256，实测追平单流上限）",
     )
     parser.add_argument("--force", action="store_true", help="强制重新下载覆盖已有文件")
     parser.add_argument("--list", action="store_true", help="仅列出所有可用模型包")
