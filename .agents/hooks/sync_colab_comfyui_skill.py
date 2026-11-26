@@ -142,10 +142,11 @@ def build_baseline_markdown(root: Path) -> str:
     lines.append("")
     lines.append("| 模型包 ID | 默认同步 | 包含权重文件（目标子目录/文件名） |")
     lines.append("| :--- | :--- | :--- |")
+    default_packs = set(runtime.get("default_packs", []))
     for pack_id, pack in manifest.get("packs", {}).items():
-        default_sync = "是" if pack.get("default_sync") else "否"
+        default_sync = "是" if (pack_id in default_packs or pack.get("default_sync")) else "否"
         files_desc = "<br/>".join(
-            f"`{f.get('target_subdir')}/{f.get('filename')}` ({f.get('approx_gb')} GB)"
+            f"`{f.get('target_subdir')}/{f.get('filename')}` ({f.get('size_gb', f.get('approx_gb', '?'))} GB)"
             for f in pack.get("files", [])
         )
         lines.append(f"| `{pack_id}` | {default_sync} | {files_desc} |")

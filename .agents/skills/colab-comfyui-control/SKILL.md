@@ -114,12 +114,12 @@ description: >-
 
 | 模型包 ID | 默认同步 | 包含权重文件（目标子目录/文件名） |
 | :--- | :--- | :--- |
-| `minimax_h3_fl2va_bf16` | 否 | `diffusion_models/minimax_h3_fl2va_bf16.safetensors` (None GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (None GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (None GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (None GB) |
-| `minimax_h3_ref2va_bf16` | 否 | `diffusion_models/minimax_h3_ref2va_bf16.safetensors` (None GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (None GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (None GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (None GB) |
-| `minimax_h3_turbo_lora` | 否 | `loras/minimax_h3_fl2v_turbo_8step_v1.2_768p_comfyui_bf16.safetensors` (None GB)<br/>`loras/minimax_h3_ref2v_turbo_8step_v1.1_768p_comfyui_bf16.safetensors` (None GB) |
-| `minimax_h3_fl2va_int8_full` | 否 | `diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors` (None GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (None GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (None GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (None GB) |
-| `minimax_h3_ref2va_int8_full` | 否 | `diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors` (None GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (None GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (None GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (None GB) |
-| `qwen3vl_bf16_optional` | 否 | `text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors` (None GB) |
+| `minimax_h3_fl2va_bf16` | 是 | `diffusion_models/minimax_h3_fl2va_bf16.safetensors` (? GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (? GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (? GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (? GB) |
+| `minimax_h3_ref2va_bf16` | 否 | `diffusion_models/minimax_h3_ref2va_bf16.safetensors` (? GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (? GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (? GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (? GB) |
+| `minimax_h3_turbo_lora` | 是 | `loras/minimax_h3_fl2v_turbo_8step_v1.2_768p_comfyui_bf16.safetensors` (? GB)<br/>`loras/minimax_h3_ref2v_turbo_8step_v1.1_768p_comfyui_bf16.safetensors` (? GB) |
+| `minimax_h3_fl2va_int8_full` | 否 | `diffusion_models/minimax_h3_fl2va_int8_convrot.safetensors` (? GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (? GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (? GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (? GB) |
+| `minimax_h3_ref2va_int8_full` | 否 | `diffusion_models/minimax_h3_ref2va_int8_convrot.safetensors` (? GB)<br/>`text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors` (? GB)<br/>`vae/minimax_h3_video_vae_fp16.safetensors` (? GB)<br/>`vae/minimax_h3_audio_vae_fp32.safetensors` (? GB) |
+| `qwen3vl_bf16_optional` | 否 | `text_encoders/qwen3vl_32b_minimax_h3_bf16.safetensors` (? GB) |
 
 ### 6.3 ComfyUI 与自定义节点锁定 (`configs/nodes_lock.json`)
 
