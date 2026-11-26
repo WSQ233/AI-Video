@@ -1,8 +1,8 @@
 {
   "project_id": "02_yongzheng_ep12_huang",
   "title": "雍正王朝第12集改编：白宫乾清宫议举新CEO与黄仁勋复立风云",
-  "type": "video_ref_character_replacement",
-  "generation_mode": "source_video_plus_reference_images_direct",
+  "type": "ref2va_multi_angle_character_drama",
+  "generation_mode": "ref2va_multi3_direct",
   "dubbing_language": "zh-CN (中文配音，音色与各人物真实声纹一致)",
   "engine": "MiniMax-H3-33.1B-BF16",
   "max_shot_duration_sec": 15,

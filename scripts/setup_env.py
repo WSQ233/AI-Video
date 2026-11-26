@@ -308,7 +308,13 @@ def write_extra_model_paths(comfy_dir: Path, shared_models_dir: Path) -> None:
     (comfy_dir / "extra_model_paths.yaml").write_text(yaml_content, encoding="utf-8")
 
 
-def sync_project_files_to_drive(repo_root: Path, shared_dir: Path, project_dir: Path, project_id: str) -> None:
+def sync_project_files_to_drive(
+    repo_root: Path,
+    shared_dir: Path,
+    project_dir: Path,
+    project_id: str,
+    overwrite_configs: bool = False,
+) -> None:
     """确保共享层与剧本项目云端目录（原始剧本、分镜头剧本、图片、人物独立目录、工作流、产出视频）完整并同步。"""
     (shared_dir / "workflows").mkdir(parents=True, exist_ok=True)
     (shared_dir / "logs").mkdir(parents=True, exist_ok=True)
@@ -334,7 +340,7 @@ def sync_project_files_to_drive(repo_root: Path, shared_dir: Path, project_dir: 
         for fname in ("project.json", "source_script.md", "storyboard.md", "tasks.csv", "script.md"):
             src = src_pdir / fname
             dst = project_dir / fname
-            if src.exists() and not dst.exists():
+            if src.exists() and (overwrite_configs or not dst.exists()):
                 shutil.copy2(src, dst)
 
         # 2. 同步剧本项目专属 ComfyUI 流程 (projects/<project_id>/workflows/*.json)
@@ -342,7 +348,7 @@ def sync_project_files_to_drive(repo_root: Path, shared_dir: Path, project_dir: 
         if src_wf_dir.exists():
             for wf in src_wf_dir.glob("*.json"):
                 dst_wf = project_dir / "workflows" / wf.name
-                if not dst_wf.exists():
+                if overwrite_configs or not dst_wf.exists():
                     shutil.copy2(wf, dst_wf)
 
         # 3. 递归同步人物独立目录（含 outfits/、voice/）、视觉场景/道具/关键帧目录 (images/*)、原视频参考目录 (videos/*) 与音频目录 (audio/*)
@@ -364,7 +370,7 @@ def sync_project_files_to_drive(repo_root: Path, shared_dir: Path, project_dir: 
     if repo_shared_wf.exists():
         for wf in repo_shared_wf.glob("*.json"):
             for target_wf in (shared_dir / "workflows" / wf.name, project_dir / "workflows" / wf.name):
-                if not target_wf.exists():
+                if overwrite_configs or not target_wf.exists():
                     shutil.copy2(wf, target_wf)
 
 
@@ -388,6 +394,7 @@ def main() -> int:
     )
     parser.add_argument("--enable-ltx", action="store_true", help="强制启用 ComfyUI-LTXVideo 节点")
     parser.add_argument("--sageattention", action="store_true", help="安装 SageAttention 2.x (可选提速)")
+    parser.add_argument("--sync-project-configs", action="store_true", help="用仓库最新 project.json/storyboard.md/tasks.csv/workflows 覆盖云端项目配置（不影响云端图片/视频/输出资产）")
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root).resolve()
@@ -448,7 +455,13 @@ def main() -> int:
 
     # 4. 初始化独立剧本项目云端目录并软链接直连 ComfyUI
     print(f"\n[剧本项目云端绑定] 将 ComfyUI 挂载到独立剧本项目: {project_dir}")
-    sync_project_files_to_drive(repo_root, shared_dir, project_dir, project_id)
+    sync_project_files_to_drive(
+        repo_root,
+        shared_dir,
+        project_dir,
+        project_id,
+        overwrite_configs=args.sync_project_configs,
+    )
     mount_project_input_assets(comfy_dir / "input", project_dir)
     ensure_symlink(comfy_dir / "output", project_dir / "outputs")
     ensure_symlink(comfy_dir / "user" / "default" / "workflows", project_dir / "workflows")

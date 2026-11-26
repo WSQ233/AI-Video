@@ -248,6 +248,7 @@ def main() -> int:
 
         resolved_image = resolve_project_image(row.get("image", ""), project_dir, comfy_input_dir)
         resolved_image_2 = resolve_project_image(row.get("image_2", ""), project_dir, comfy_input_dir)
+        resolved_image_3 = resolve_project_image(row.get("image_3", ""), project_dir, comfy_input_dir)
         resolved_video = resolve_project_image(row.get("video", ""), project_dir, comfy_input_dir)
         replacements: dict[str, Any] = {
             "__TASK_ID__": task_id,
@@ -255,6 +256,7 @@ def main() -> int:
             "__NEGATIVE_PROMPT__": row.get("negative_prompt", ""),
             "__IMAGE__": resolved_image,
             "__IMAGE_2__": resolved_image_2,
+            "__IMAGE_3__": resolved_image_3,
             "__VIDEO__": resolved_video,
             "__SEED__": seed,
             "__WIDTH__": int(row["width"]) if (row.get("width") or "").strip().isdigit() else 1344,
@@ -270,7 +272,7 @@ def main() -> int:
         print(
             f"[{idx}/{total}] 开始执行 {task_id} "
             f"(workflow={wf_name}, frames={frames}/{fps}fps={frames/fps:.2f}s, "
-            f"image={resolved_image or 'None'}, image_2={resolved_image_2 or 'None'}, video={resolved_video or 'None'}, seed={seed})..."
+            f"image={resolved_image or 'None'}, image_2={resolved_image_2 or 'None'}, image_3={resolved_image_3 or 'None'}, video={resolved_video or 'None'}, seed={seed})..."
         )
         t0 = time.time()
         try:
@@ -289,6 +291,7 @@ def main() -> int:
                 "prompt": row.get("prompt", ""),
                 "image": resolved_image,
                 "image_2": resolved_image_2,
+                "image_3": resolved_image_3,
                 "video": resolved_video,
                 "outputs": files,
                 "elapsed_sec": elapsed,

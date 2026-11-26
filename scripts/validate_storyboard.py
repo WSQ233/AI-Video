@@ -171,6 +171,7 @@ def validate_one_project(project_dir: Path, max_seconds: float = 15.0) -> list[s
         prompt = (row.get("prompt") or "").strip()
         image = (row.get("image") or "").strip()
         image_2 = (row.get("image_2") or "").strip()
+        image_3 = (row.get("image_3") or "").strip()
         video = (row.get("video") or "").strip()
         if "Audio:" not in prompt:
             errors.append(f"[{pid}] 分镜 {tid} 的 prompt 缺少 'Audio:' 原生音轨描述段落")
@@ -190,6 +191,11 @@ def validate_one_project(project_dir: Path, max_seconds: float = 15.0) -> list[s
                     errors.append(f"[{pid}] 多图锚定分镜 {tid} ({wf_name}) 必须在 image_2 列提供第二参考图（如配角或 images/scenes/<sid>/env_master.png）")
                 if "<Picture 2>" not in prompt:
                     errors.append(f"[{pid}] 多图锚定分镜 {tid} 的 prompt 必须显式包含 '<Picture 2>' 引用第二参考图")
+            if "multi3" in wf_lower:
+                if not image_3:
+                    errors.append(f"[{pid}] 三图锚定分镜 {tid} ({wf_name}) 必须在 image_3 列提供第三参考图")
+                if "<Picture 3>" not in prompt:
+                    errors.append(f"[{pid}] 三图锚定分镜 {tid} 的 prompt 必须显式包含 '<Picture 3>' 引用第三参考图")
             if "video" in wf_lower:
                 if not video:
                     errors.append(f"[{pid}] 原视频+参考图直出分镜 {tid} ({wf_name}) 必须在 video 列提供原视频切片路径 (如 videos/source_clips/{tid}_src.mp4)")
