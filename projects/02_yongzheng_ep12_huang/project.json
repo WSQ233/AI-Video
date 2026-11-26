@@ -1,0 +1,138 @@
+{
+  "project_id": "02_yongzheng_ep12_huang",
+  "title": "雍正王朝第12集改编：白宫乾清宫议举新CEO与黄仁勋复立风云",
+  "type": "video_ref_character_replacement",
+  "generation_mode": "source_video_plus_reference_images_direct",
+  "dubbing_language": "zh-CN (中文配音，音色与各人物真实声纹一致)",
+  "engine": "MiniMax-H3-33.1B-BF16",
+  "max_shot_duration_sec": 15,
+  "frame_grid_rule": "17k+5 @ 24fps (max 345 frames = 14.38s <= 15s)",
+  "active_packs": [
+    "minimax_h3_ref2va_bf16",
+    "minimax_h3_turbo_lora"
+  ],
+  "resolution": "1344x768",
+  "fps": 24,
+  "shots": 31,
+  "source_video_url": "https://www.youtube.com/watch?v=ptQeyZ7y73I",
+  "character_replacement_map": {
+    "康熙": "trump (特朗普)",
+    "太子 / 二阿哥胤礽": "jensen_huang (黄仁勋 / CEO)",
+    "张廷玉": "scott_bessent (贝森特)",
+    "佟国维": "marco_rubio (鲁比奥)",
+    "马齐(马奇)": "jd_vance (万斯)",
+    "托合齐/耿索图/凌普": "科莱特·克雷斯 / 马拉科夫斯基 / 杰伊·普里（英伟达内部支持者）",
+    "王掞": "马斯克 (Elon Musk)",
+    "朕一人": "英伟达董事会",
+    "八阿哥胤禩 / 隆科多": "Arm的雷内·哈斯 / 卢特尼克",
+    "其余角色_民主党换脸群臣": "democrats (民主党人士换脸)",
+    "其余角色_共和党换脸群臣": "republicans (共和党人士换脸)"
+  },
+  "cloud_dir": "/content/drive/MyDrive/AI_Video/projects/02_yongzheng_ep12_huang",
+  "structure": {
+    "source_script": "source_script.md",
+    "storyboard": "storyboard.md",
+    "tasks_csv": "tasks.csv",
+    "images_dir": "images",
+    "scenes_dir": "images/scenes",
+    "props_dir": "images/props",
+    "keyframes_dir": "images/keyframes",
+    "videos_dir": "videos",
+    "source_clips_dir": "videos/source_clips",
+    "characters_dir": "characters",
+    "audio_dir": "audio",
+    "workflows_dir": "workflows",
+    "outputs_dir": "outputs",
+    "raw_batches_dir": "outputs/raw_batches",
+    "selected_shots_dir": "outputs/selected_shots",
+    "extracted_frames_dir": "outputs/extracted_frames",
+    "final_cut_dir": "outputs/final_cut",
+    "logs_dir": "logs"
+  },
+  "characters": [
+    {
+      "character_id": "trump",
+      "name": "特朗普",
+      "replaces": "康熙",
+      "role": "核心主宰 / 乾清宫帝王",
+      "folder": "characters/trump",
+      "anchor_image": "characters/trump/ref_trump.png",
+      "outfits_dir": "characters/trump/outfits",
+      "voice_dir": "characters/trump/voice"
+    },
+    {
+      "character_id": "jensen_huang",
+      "name": "黄仁勋",
+      "replaces": "太子",
+      "role": "算力东宫储君（废而复立）",
+      "folder": "characters/jensen_huang",
+      "anchor_image": "characters/jensen_huang/ref_jensen_huang.png",
+      "outfits_dir": "characters/jensen_huang/outfits",
+      "voice_dir": "characters/jensen_huang/voice"
+    },
+    {
+      "character_id": "scott_bessent",
+      "name": "贝森特",
+      "replaces": "张廷玉",
+      "role": "内阁财政重臣（独保太子复立）",
+      "folder": "characters/scott_bessent",
+      "anchor_image": "characters/scott_bessent/ref_scott_bessent.png",
+      "outfits_dir": "characters/scott_bessent/outfits",
+      "voice_dir": "characters/scott_bessent/voice"
+    },
+    {
+      "character_id": "marco_rubio",
+      "name": "鲁比奥",
+      "replaces": "佟国维",
+      "role": "上书房首辅 / 逼宫急先锋",
+      "folder": "characters/marco_rubio",
+      "anchor_image": "characters/marco_rubio/ref_marco_rubio.png",
+      "outfits_dir": "characters/marco_rubio/outfits",
+      "voice_dir": "characters/marco_rubio/voice"
+    },
+    {
+      "character_id": "jd_vance",
+      "name": "万斯",
+      "replaces": "马齐（马奇）",
+      "role": "上书房大学士（禀报百官意向）",
+      "folder": "characters/jd_vance",
+      "anchor_image": "characters/jd_vance/ref_jd_vance.png",
+      "outfits_dir": "characters/jd_vance/outfits",
+      "voice_dir": "characters/jd_vance/voice"
+    },
+    {
+      "character_id": "democrats",
+      "name": "民主党阵营",
+      "replaces": "其余角色（朝堂民主党人士换脸群臣）",
+      "role": "满朝文武民主党人士换脸队列",
+      "folder": "characters/democrats",
+      "anchor_image": "characters/democrats/ref_democrats.png",
+      "outfits_dir": "characters/democrats/outfits",
+      "voice_dir": "characters/democrats/voice"
+    },
+    {
+      "character_id": "republicans",
+      "name": "共和党阵营",
+      "replaces": "其余角色（朝堂共和党人士换脸群臣）",
+      "role": "满朝文武共和党人士换脸队列",
+      "folder": "characters/republicans",
+      "anchor_image": "characters/republicans/ref_republicans.png",
+      "outfits_dir": "characters/republicans/outfits",
+      "voice_dir": "characters/republicans/voice"
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "scene01_qianqing_palace",
+      "title": "INT. 乾清宫大殿议储朝会 - 日",
+      "folder": "images/scenes/scene01_qianqing_palace",
+      "anchor_image": "images/scenes/scene01_qianqing_palace/env_master.png"
+    },
+    {
+      "scene_id": "scene02_imperial_desk_memorial",
+      "title": "INT. 乾清宫御案宣读保举奏折 - 日",
+      "folder": "images/scenes/scene02_imperial_desk_memorial",
+      "anchor_image": "images/scenes/scene02_imperial_desk_memorial/env_master.png"
+    }
+  ]
+}

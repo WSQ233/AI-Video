@@ -1,0 +1,30 @@
+{
+  "character_id": "jd_vance",
+  "name": "万斯",
+  "replaces_original_role": "马齐 (Grand Secretary Maci)",
+  "gender": "male",
+  "age": 42,
+  "role": "上书房大学士（替换《雍正王朝》第12集首位出列禀报百官推举情况的马齐）",
+  "visual_anchor_en": "42-year-old Caucasian male looking like JD Vance with a neatly trimmed full dark beard, short dark hair, piercing blue eyes, and a cautious calculated expression, wearing a Qing Dynasty first-rank official court robe with embroidered badge and red-tasseled court hat",
+  "face_anchor_en": "42-year-old Caucasian male looking like JD Vance, neatly trimmed full dark beard, piercing blue eyes, fuller cheeks, cautious calculated expression",
+  "wardrobe_en": "Qing Dynasty first-rank Grand Secretary court robe (Chaofu) with embroidered badge and court beads, replacing Maci in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with JD Vance's exact vocal timbre: grounded, resonant mid-low baritone voice, cautious yet calculated political cadence",
+  "reference_images": {
+    "primary": "characters/jd_vance/ref_jd_vance.png",
+    "front_closeup": "characters/jd_vance/ref_jd_vance_front.png",
+    "half_body": "characters/jd_vance/ref_jd_vance_half.png",
+    "full_body": "characters/jd_vance/ref_jd_vance_full.png"
+  },
+  "outfits": {
+    "outfit_01_maci_court_robe": {
+      "label": "乾清宫上书房大臣朝服造型（替换马齐）",
+      "prompt_en": "wearing a Qing Dynasty first-rank Grand Secretary court robe with embroidered badge and court beads",
+      "reference_image": "characters/jd_vance/outfits/outfit_01_maci_court_robe.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/jd_vance/voice/voice_jd_vance.wav",
+    "description": "3~8 秒万斯浑厚沉稳男中音参考干音（供 Ref2VA 声纹锁定中文配音音色）"
+  },
+  "notes": "在原视频+参考图直出工作流中直接替换马齐（马奇），使用万斯标志性浑厚低沉、谨慎算计的男中音进行中文配音。"
+}

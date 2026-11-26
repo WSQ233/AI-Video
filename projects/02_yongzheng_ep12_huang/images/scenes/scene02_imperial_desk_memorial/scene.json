@@ -1,0 +1,13 @@
+{
+  "scene_id": "scene02_imperial_desk_memorial",
+  "title": "INT. 乾清宫御案宣读保举奏折 - 日",
+  "location_type": "INT",
+  "time_of_day": "DAY",
+  "spatial_anchor_en": "elevated imperial dragon desk inside Qianqing Palace stacked with yellow silk memorials, ornate bronze incense burner, golden throne backdrop overlooking the court ministers below",
+  "lighting_palette_en": "warm amber candle and daylight mix illuminating the yellow silk memorials and the Emperor's face, high-contrast cinematic depth of field",
+  "base_ambience_en": "quiet palace interior ambience, crisp paper rustling of yellow silk memorials, solemn court tension",
+  "reference_images": {
+    "master": "images/scenes/scene02_imperial_desk_memorial/env_master.png",
+    "reverse_angle": "images/scenes/scene02_imperial_desk_memorial/env_reverse.png"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "scene_id": "scene01_rainy_street",
+  "title": "EXT. 旧城区赛博雨夜长街 - 子夜",
+  "location_type": "EXT",
+  "time_of_day": "MIDNIGHT_RAIN",
+  "spatial_anchor_en": "a rainy midnight street in East Asia with wet asphalt, glowing puddles reflecting neon lights, and a cozy vintage coffee shop ahead featuring warm amber window light and a crisp glowing neon sign reading 'MIDNIGHT CAFE'",
+  "lighting_palette_en": "moody cyberpunk-noir lighting, cool blue-cyan rain reflections contrasting with warm amber tungsten light spilling from the cafe entrance, subtle mist, 35mm anamorphic bokeh",
+  "base_ambience_en": "steady midnight rain pattering, distant muffled city traffic, footsteps splashing softly on wet pavement",
+  "reference_images": {
+    "master": "images/scenes/scene01_rainy_street/env_master.png"
+  }
+}

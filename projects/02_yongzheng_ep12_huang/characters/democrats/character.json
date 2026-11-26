@@ -1,0 +1,30 @@
+{
+  "character_id": "democrats",
+  "name": "民主党阵营",
+  "replaces_original_role": "朝堂其余王公大臣（左列八爷党/反对派百官）",
+  "gender": "male",
+  "age": 70,
+  "role": "满朝文武换脸群像·民主党阵营（替换乾清宫内其余反对派朝臣，匹配舒默、沃伦、佩洛西等民主党代表人物面孔）",
+  "visual_anchor_en": "queue of recognizable Democratic Party politicians (resembling Chuck Schumer with low-perched reading glasses, Nancy Pelosi, and Elizabeth Warren) face-swapped onto the surrounding Qing Dynasty court ministers in dark royal-blue official robes",
+  "face_anchor_en": "recognizable Democratic Party politicians with silver hair and reading glasses face-swapped onto Qing court ministers",
+  "wardrobe_en": "dark royal-blue Qing Dynasty court official robes adorned with subtle blue donkey lapel insignia pins, replacing the surrounding court ministers in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with urgent, indignant senior politician vocal timbre and confrontational Congressional hearing cadence",
+  "reference_images": {
+    "primary": "characters/democrats/ref_democrats.png",
+    "front_closeup": "characters/democrats/ref_democrats_front.png",
+    "half_body": "characters/democrats/ref_democrats_half.png",
+    "full_body": "characters/democrats/ref_democrats_full.png"
+  },
+  "outfits": {
+    "outfit_01_blue_court_robe": {
+      "label": "深蓝朝服配蓝驴徽章逼宫造型（替换佟国维及党羽）",
+      "prompt_en": "wearing dark royal-blue Qing Dynasty court official robes adorned with blue donkey insignia pins",
+      "reference_image": "characters/democrats/outfits/outfit_01_blue_court_robe.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/democrats/voice/voice_democrats.wav",
+    "description": "3~8 秒国会质询慷慨激昂人声干音（供 Ref2VA <Audio 1> 声纹锁定）"
+  },
+  "notes": "在原视频+参考图直出工作流中替换佟国维及八爷党急先锋，演绎借‘公议’向特朗普施压并当庭怒斥贝森特的对手戏。"
+}

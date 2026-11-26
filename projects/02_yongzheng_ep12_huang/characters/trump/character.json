@@ -1,0 +1,30 @@
+{
+  "character_id": "trump",
+  "name": "特朗普",
+  "replaces_original_role": "康熙皇帝 (Emperor Kangxi)",
+  "gender": "male",
+  "age": 78,
+  "role": "核心主宰 / 乾清宫帝王（替换《雍正王朝》第12集康熙帝）",
+  "visual_anchor_en": "78-year-old Caucasian male looking like Donald Trump with signature swept-back golden blonde hair and commanding authoritative expression, wearing a bright yellow Qing Dynasty imperial dragon robe with intricate golden dragon embroidery and jade court beads",
+  "face_anchor_en": "78-year-old Caucasian male looking like Donald Trump, signature swept-back golden blonde hair, stern authoritative expression, sharp blue eyes, expressive mouth and hand gestures",
+  "wardrobe_en": "bright yellow Qing Dynasty imperial dragon robe (Longpao) with golden dragon embroidery and imperial court beads, replacing Emperor Kangxi in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with Donald Trump's exact vocal timbre: deep, raspy, resonant baritone voice, distinctive punchy cadence, dramatic emphasis and authoritative presidential tone",
+  "reference_images": {
+    "primary": "characters/trump/ref_trump.png",
+    "front_closeup": "characters/trump/ref_trump_front.png",
+    "half_body": "characters/trump/ref_trump_half.png",
+    "full_body": "characters/trump/ref_trump_full.png"
+  },
+  "outfits": {
+    "outfit_01_imperial_dragon_robe": {
+      "label": "乾清宫议储明黄龙袍造型（替换康熙朝服）",
+      "prompt_en": "wearing a bright yellow Qing Dynasty imperial dragon robe with intricate golden dragon embroidery and jade court beads",
+      "reference_image": "characters/trump/outfits/outfit_01_imperial_dragon_robe.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/trump/voice/voice_trump.wav",
+    "description": "3~8 秒特朗普威严演讲人声参考干音（供 Ref2VA <Audio 1> 声纹锁定）"
+  },
+  "notes": "在原视频+参考图直出工作流 (minimax_h3_ref2va_video_multi_api.json) 中绑定为 <Picture 1>，直接替换 <Video 1> 中御案后的康熙皇帝。"
+}

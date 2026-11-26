@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Colab GPU (H100 / A100 / L4) 一键装机与 Google Drive 资产挂载脚本：
+Colab GPU (H100 / A100 / L4) 一键装机与 Google Drive 剧本项目资产挂载脚本：
 1. 克隆并锁定 ComfyUI 与精简自定义节点
-2. 将 input / output / workflows / loras 软链接直连 5TB Google Drive（实时持久化，断线不丢）
+2. 将当前剧本项目的 images/、characters/<character_id>/、outputs/、workflows/ 与 ComfyUI 直连
 3. 将本次启用的大模型包从 Google Drive 并行拷贝到 Colab 本地高速 SSD（避免 FUSE 读取卡顿）
 4. 自动生成 extra_model_paths.yaml 兜底发现 Drive 全量模型，并输出环境预检报告
 """
@@ -19,6 +19,11 @@ import sys
 import time
 from pathlib import Path
 from typing import Any
+
+
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".avi"}
+MEDIA_EXTENSIONS = IMAGE_EXTENSIONS | VIDEO_EXTENSIONS
 
 
 def run_cmd(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subprocess.CompletedProcess:
@@ -69,7 +74,6 @@ def ensure_symlink(link_path: Path, target_path: Path) -> None:
             return
         link_path.unlink()
     elif link_path.exists():
-        # 迁移原目录中已有默认文件后再替换为软链接
         for item in link_path.iterdir():
             dst = target_path / item.name
             if not dst.exists():
@@ -77,6 +81,66 @@ def ensure_symlink(link_path: Path, target_path: Path) -> None:
         shutil.rmtree(link_path)
     link_path.symlink_to(target_path, target_is_directory=True)
     print(f"  [软链接] {link_path} -> {target_path}")
+
+
+def ensure_file_symlink(link_path: Path, target_file: Path) -> None:
+    """在本地 ComfyUI/input 下为人物锚定图和图片资源创建便捷文件软链接，兼容相对路径与平铺文件名。"""
+    if not target_file.is_file():
+        return
+    link_path.parent.mkdir(parents=True, exist_ok=True)
+    if link_path.is_symlink() or link_path.exists():
+        try:
+            if link_path.resolve() == target_file.resolve():
+                return
+        except Exception:
+            pass
+        if link_path.is_symlink() or link_path.is_file():
+            link_path.unlink()
+    link_path.symlink_to(target_file)
+
+
+def mount_project_input_assets(comfy_input_dir: Path, project_dir: Path) -> None:
+    """
+    将剧本项目下的 images/（通用图片资源）与 characters/<character_id>/（人物形象独立目录）
+    挂载到 ComfyUI/input 下：
+    1. 支持 `characters/<character_id>/ref_xxx.png` 与 `images/xxx.png` 规范相对路径加载
+    2. 自动将已有图片平铺软链接到 `ComfyUI/input/` 根目录，方便 WebUI 下拉框选择与旧版简写文件名兜底
+    """
+    if comfy_input_dir.is_symlink():
+        comfy_input_dir.unlink()
+    comfy_input_dir.mkdir(parents=True, exist_ok=True)
+
+    for sub in ("images", "characters", "videos"):
+        target_sub = project_dir / sub
+        target_sub.mkdir(parents=True, exist_ok=True)
+        ensure_symlink(comfy_input_dir / sub, target_sub)
+
+    # 兼容旧版云盘上的 inputs/ 目录（如存在旧参考图，自动同步回 characters/ 或挂入 inputs 子链接）
+    legacy_inputs = project_dir / "inputs"
+    if legacy_inputs.exists() and legacy_inputs.is_dir():
+        ensure_symlink(comfy_input_dir / "inputs", legacy_inputs)
+        for img in legacy_inputs.iterdir():
+            if img.is_file() and img.suffix.lower() in IMAGE_EXTENSIONS:
+                ensure_file_symlink(comfy_input_dir / img.name, img)
+                # 若是 ref_<character_id>.png 且对应人物文件夹存在但尚无该图，自动复制一份到人物独立目录
+                if img.stem.startswith("ref_"):
+                    cid = img.stem[len("ref_"):].split("_")[0]
+                    char_dir = project_dir / "characters" / cid
+                    if char_dir.is_dir() and not (char_dir / img.name).exists():
+                        shutil.copy2(img, char_dir / img.name)
+                        print(f"  [自动归档人物锚定图] {img.name} -> {char_dir / img.name}")
+
+    # 为 characters/<character_id>/*、images/* 与 videos/* 下的媒体创建平铺软链接到 ComfyUI/input/
+    for img in (project_dir / "characters").rglob("*"):
+        if img.is_file() and img.suffix.lower() in IMAGE_EXTENSIONS:
+            ensure_file_symlink(comfy_input_dir / img.name, img)
+    for img in (project_dir / "images").rglob("*"):
+        if img.is_file() and img.suffix.lower() in IMAGE_EXTENSIONS:
+            ensure_file_symlink(comfy_input_dir / img.name, img)
+    if (project_dir / "videos").exists():
+        for vid in (project_dir / "videos").rglob("*"):
+            if vid.is_file() and vid.suffix.lower() in VIDEO_EXTENSIONS:
+                ensure_file_symlink(comfy_input_dir / vid.name, vid)
 
 
 def copy_one_file(src: Path, dst: Path) -> str:
@@ -105,7 +169,6 @@ def stage_models_from_drive(
     local_models = comfy_dir / "models"
     missing: list[str] = []
 
-    # LoRA 体积小且变动频繁，始终软链接直连 Drive
     ensure_symlink(local_models / "loras", drive_models / "loras")
 
     if mode == "symlink":
@@ -113,7 +176,6 @@ def stage_models_from_drive(
             ensure_symlink(local_models / sub, drive_models / sub)
         return missing
 
-    # copy_to_local 模式：仅并行拷贝本次勾选 pack 的权重文件到高速本地盘
     jobs: list[tuple[Path, Path]] = []
     seen: set[tuple[str, str]] = set()
     for pid in packs:
@@ -166,30 +228,69 @@ def write_extra_model_paths(comfy_dir: Path, shared_models_dir: Path) -> None:
 
 
 def sync_project_files_to_drive(repo_root: Path, shared_dir: Path, project_dir: Path, project_id: str) -> None:
-    """确保共享模板与独立项目云端目录存在，并将仓库中的工作流/剧本/任务表同步到云端（不覆盖已有修改）。"""
+    """确保共享层与剧本项目云端目录（原始剧本、分镜头剧本、图片、人物独立目录、工作流、产出视频）完整并同步。"""
     (shared_dir / "workflows").mkdir(parents=True, exist_ok=True)
     (shared_dir / "logs").mkdir(parents=True, exist_ok=True)
-    for sub in ("inputs", "workflows", "outputs", "logs"):
+    for sub in (
+        "images/scenes",
+        "images/props",
+        "images/keyframes",
+        "videos/source_clips",
+        "characters",
+        "audio",
+        "workflows",
+        "outputs/raw_batches",
+        "outputs/selected_shots",
+        "outputs/extracted_frames",
+        "outputs/final_cut",
+        "logs",
+    ):
         (project_dir / sub).mkdir(parents=True, exist_ok=True)
+
+    src_pdir = repo_root / "projects" / project_id
+    if src_pdir.exists():
+        # 1. 同步剧本项目核心文档与任务表（project.json、原始剧本 source_script.md、分镜头剧本 storyboard.md、tasks.csv）
+        for fname in ("project.json", "source_script.md", "storyboard.md", "tasks.csv", "script.md"):
+            src = src_pdir / fname
+            dst = project_dir / fname
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+
+        # 2. 同步剧本项目专属 ComfyUI 流程 (projects/<project_id>/workflows/*.json)
+        src_wf_dir = src_pdir / "workflows"
+        if src_wf_dir.exists():
+            for wf in src_wf_dir.glob("*.json"):
+                dst_wf = project_dir / "workflows" / wf.name
+                if not dst_wf.exists():
+                    shutil.copy2(wf, dst_wf)
+
+        # 3. 递归同步人物独立目录（含 outfits/、voice/）、视觉场景/道具/关键帧目录 (images/*)、原视频参考目录 (videos/*) 与音频目录 (audio/*)
+        for tree_sub in ("characters", "images", "videos", "audio"):
+            src_tree = src_pdir / tree_sub
+            if src_tree.exists():
+                for item in src_tree.rglob("*"):
+                    rel_item = item.relative_to(src_pdir)
+                    dst_item = project_dir / rel_item
+                    if item.is_dir():
+                        dst_item.mkdir(parents=True, exist_ok=True)
+                    elif item.is_file() and item.name != ".gitkeep":
+                        dst_item.parent.mkdir(parents=True, exist_ok=True)
+                        if not dst_item.exists():
+                            shutil.copy2(item, dst_item)
+
+    # 5. 共享工作流模板兜底补充
     repo_shared_wf = repo_root / "workflows" / "shared"
     if repo_shared_wf.exists():
         for wf in repo_shared_wf.glob("*.json"):
             for target_wf in (shared_dir / "workflows" / wf.name, project_dir / "workflows" / wf.name):
                 if not target_wf.exists():
                     shutil.copy2(wf, target_wf)
-    src_pdir = repo_root / "projects" / project_id
-    if src_pdir.exists():
-        for fname in ("project.json", "script.md", "tasks.csv"):
-            src = src_pdir / fname
-            dst = project_dir / fname
-            if src.exists() and not dst.exists():
-                shutil.copy2(src, dst)
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Colab GPU ComfyUI 一键装机脚本（支持独立项目挂载）")
+    parser = argparse.ArgumentParser(description="Colab GPU ComfyUI 一键装机脚本（支持独立剧本项目挂载）")
     parser.add_argument("--repo-root", default=".", help="AI-Video 仓库根目录")
-    parser.add_argument("--project", default=None, help="本次挂载的独立项目 ID（如 01_rainy_signal）")
+    parser.add_argument("--project", default=None, help="本次挂载的独立剧本项目 ID（如 01_rainy_signal）")
     parser.add_argument("--packs", nargs="*", default=None, help="本次预热的模型包 ID")
     parser.add_argument("--mode", choices=["copy_to_local", "symlink"], default=None, help="模型加载模式")
     parser.add_argument("--enable-ltx", action="store_true", help="强制启用 ComfyUI-LTXVideo 节点")
@@ -219,7 +320,7 @@ def main() -> int:
     print(f"GPU 检测       : {gpu_raw} -> 档位 [{gpu_tier}]")
     print(f"本地剩余磁盘   : {disk_free_gb:.1f} GB")
     print(f"云端共享模型库 : {shared_models_dir}")
-    print(f"当前独立项目   : {project_id} -> {project_dir}")
+    print(f"当前剧本项目   : {project_id} -> {project_dir}")
     print(f"启用模型包     : {', '.join(packs)} (模式: {mode})")
     print("==========================================")
 
@@ -252,10 +353,10 @@ def main() -> int:
         print("[可选加速] 正在安装 SageAttention...")
         run_cmd([sys.executable, "-m", "pip", "install", "-q", "sageattention>=2.2.0"], check=False)
 
-    # 4. 初始化独立项目云端目录并软链接直连 ComfyUI（输入/输出严格隔离到当前项目下！）
-    print(f"\n[项目云端绑定] 将 ComfyUI 挂载到独立项目: {project_dir}")
+    # 4. 初始化独立剧本项目云端目录并软链接直连 ComfyUI
+    print(f"\n[剧本项目云端绑定] 将 ComfyUI 挂载到独立剧本项目: {project_dir}")
     sync_project_files_to_drive(repo_root, shared_dir, project_dir, project_id)
-    ensure_symlink(comfy_dir / "input", project_dir / "inputs")
+    mount_project_input_assets(comfy_dir / "input", project_dir)
     ensure_symlink(comfy_dir / "output", project_dir / "outputs")
     ensure_symlink(comfy_dir / "user" / "default" / "workflows", project_dir / "workflows")
 
@@ -289,7 +390,7 @@ def main() -> int:
         for m in missing:
             print(f"  - {m}")
     else:
-        print("\n[预检通过] 所有选定模型包与独立项目目录均已就绪！")
+        print("\n[预检通过] 所有选定模型包与独立剧本项目目录均已就绪！")
 
     print(f"[推荐启动参数] python main.py {gpu_cfg['comfyui_args']}")
     return 0

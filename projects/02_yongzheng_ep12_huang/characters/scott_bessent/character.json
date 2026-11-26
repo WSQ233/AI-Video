@@ -1,0 +1,30 @@
+{
+  "character_id": "scott_bessent",
+  "name": "贝森特",
+  "replaces_original_role": "张廷玉 (Grand Secretary Zhang Tingyu)",
+  "gender": "male",
+  "age": 62,
+  "role": "内阁财政重臣（替换《雍正王朝》第12集独上奇折保举太子的张廷玉）",
+  "visual_anchor_en": "62-year-old Caucasian male looking like Scott Bessent with neatly combed silver-gray hair and refined silver-rimmed glasses, wearing a Qing Dynasty first-rank official dark navy court robe with an embroidered crane badge and red-tasseled court hat",
+  "face_anchor_en": "62-year-old Caucasian male looking like Scott Bessent, neatly combed silver-gray hair, refined silver-rimmed glasses, composed patrician facial structure",
+  "wardrobe_en": "Qing Dynasty first-rank civil official dark navy court robe with embroidered crane badge and court beads, replacing Grand Secretary Zhang Tingyu in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with Scott Bessent's exact vocal timbre: composed, refined, articulate deep baritone voice, calm Wall Street statesman cadence and steady resonance",
+  "reference_images": {
+    "primary": "characters/scott_bessent/ref_scott_bessent.png",
+    "front_closeup": "characters/scott_bessent/ref_scott_bessent_front.png",
+    "half_body": "characters/scott_bessent/ref_scott_bessent_half.png",
+    "full_body": "characters/scott_bessent/ref_scott_bessent_full.png"
+  },
+  "outfits": {
+    "outfit_01_grand_secretary_robe": {
+      "label": "上书房一品文官仙鹤补服造型（替换张廷玉）",
+      "prompt_en": "wearing a Qing Dynasty first-rank official dark navy court robe with an embroidered crane badge and silver-rimmed glasses",
+      "reference_image": "characters/scott_bessent/outfits/outfit_01_grand_secretary_robe.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/scott_bessent/voice/voice_scott_bessent.wav",
+    "description": "3~8 秒贝森特沉稳财政访谈人声干音（供 Ref2VA <Audio 1> 声纹锁定）"
+  },
+  "notes": "在原视频+参考图直出工作流中替换张廷玉，精准演绎‘无心为恶虽恶不罚、从外部复聘黄仁勋官复原职’的破局奏对。"
+}

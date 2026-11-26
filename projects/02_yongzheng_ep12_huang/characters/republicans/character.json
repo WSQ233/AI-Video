@@ -1,0 +1,30 @@
+{
+  "character_id": "republicans",
+  "name": "共和党阵营",
+  "replaces_original_role": "朝堂其余王公大臣（右列建制派/宗室百官）",
+  "gender": "male",
+  "age": 68,
+  "role": "满朝文武换脸群像·共和党阵营（替换乾清宫内其余建制派王公百官，匹配迈克·约翰逊、麦康奈尔、卢特尼克等共和党代表人物面孔）",
+  "visual_anchor_en": "queue of recognizable Republican Party politicians (resembling Mike Johnson, Mitch McConnell, and Howard Lutnick) face-swapped onto the surrounding Qing Dynasty court officials in crimson-trimmed official robes",
+  "face_anchor_en": "recognizable Republican Party politicians with glasses and silver hair face-swapped onto Qing court officials",
+  "wardrobe_en": "crimson-trimmed Qing Dynasty court official robes adorned with subtle red elephant insignia pins, replacing the surrounding court officials in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with cautious, formal senior establishment politician vocal timbre",
+  "reference_images": {
+    "primary": "characters/republicans/ref_republicans.png",
+    "front_closeup": "characters/republicans/ref_republicans_front.png",
+    "half_body": "characters/republicans/ref_republicans_half.png",
+    "full_body": "characters/republicans/ref_republicans_full.png"
+  },
+  "outfits": {
+    "outfit_01_crimson_court_robe": {
+      "label": "绛红镶边朝服配红象徽章建制派造型（替换马齐及百官）",
+      "prompt_en": "wearing crimson-trimmed Qing Dynasty court official robes adorned with red elephant insignia pins",
+      "reference_image": "characters/republicans/outfits/outfit_01_crimson_court_robe.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/republicans/voice/voice_republicans.wav",
+    "description": "3~8 秒谨慎官僚禀报人声干音（供 Ref2VA <Audio 1> 声纹锁定）"
+  },
+  "notes": "在原视频+参考图直出工作流中替换马齐及朝堂其余群臣，与民主党阵营共同构成满朝文武两党博弈背景。"
+}

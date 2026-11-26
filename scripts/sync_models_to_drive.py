@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-将 Hugging Face 开源模型按 pack 高速同步到 5TB Google Drive。
-推荐在 Colab 免费 CPU 运行时执行，消耗 0 H100 算力单元 (CU)。
+将 Hugging Face 开源模型按 pack 高速同步到 5TB Google Drive，
+并按剧本项目维度同步初始化所有 projects/<project_id>/ 的完整目录结构与专属 ComfyUI 流程。
+推荐在 Colab 免费 CPU 运行时执行，消耗 0 计算单元 (CU)。
 """
 
 from __future__ import annotations
@@ -32,15 +33,23 @@ DRIVE_SHARED_SUBDIRS = [
 ]
 
 PROJECT_SUBDIRS = [
-    "inputs",
+    "images/scenes",
+    "images/props",
+    "images/keyframes",
+    "videos/source_clips",
+    "characters",
+    "audio",
     "workflows",
-    "outputs",
+    "outputs/raw_batches",
+    "outputs/selected_shots",
+    "outputs/extracted_frames",
+    "outputs/final_cut",
     "logs",
 ]
 
 
 def ensure_drive_layout(drive_root: Path, repo_root: Path | None = None, project_id: str | None = None) -> None:
-    """初始化 5TB Google Drive 全局共享层与独立项目文件夹，并将仓库中的共享工作流与剧本/任务表同步上云。"""
+    """初始化 5TB Google Drive 全局共享层与独立剧本项目文件夹，并将仓库中的项目剧本/分镜/人物设定/专属工作流同步上云。"""
     for rel in DRIVE_SHARED_SUBDIRS:
         (drive_root / rel).mkdir(parents=True, exist_ok=True)
     if repo_root and (repo_root / "workflows" / "shared").exists():
@@ -50,7 +59,6 @@ def ensure_drive_layout(drive_root: Path, repo_root: Path | None = None, project
                 shutil.copy2(wf, dst)
     print(f"[云端共享层就绪] {drive_root / 'shared'}")
 
-    # 将仓库中所有 projects/* 同步初始化到 5TB 云盘对应项目目录（不覆盖用户在云盘修改过的同名文件）
     projects_to_init: list[str] = []
     if repo_root and (repo_root / "projects").exists():
         for p in sorted((repo_root / "projects").iterdir()):
@@ -66,18 +74,32 @@ def ensure_drive_layout(drive_root: Path, repo_root: Path | None = None, project
         if repo_root:
             src_pdir = repo_root / "projects" / pid
             if src_pdir.exists():
-                for fname in ("project.json", "script.md", "tasks.csv"):
+                for fname in ("project.json", "source_script.md", "storyboard.md", "tasks.csv", "script.md"):
                     src_file = src_pdir / fname
                     dst_file = cloud_pdir / fname
                     if src_file.exists() and not dst_file.exists():
                         shutil.copy2(src_file, dst_file)
+
+                for tree_sub in ("characters", "images", "videos", "audio"):
+                    src_tree = src_pdir / tree_sub
+                    if src_tree.exists():
+                        for item in src_tree.rglob("*"):
+                            rel_item = item.relative_to(src_pdir)
+                            dst_item = cloud_pdir / rel_item
+                            if item.is_dir():
+                                dst_item.mkdir(parents=True, exist_ok=True)
+                            elif item.is_file() and item.name != ".gitkeep":
+                                dst_item.parent.mkdir(parents=True, exist_ok=True)
+                                if not dst_item.exists():
+                                    shutil.copy2(item, dst_item)
+
                 src_wf = src_pdir / "workflows"
                 if src_wf.exists():
                     for wf in src_wf.glob("*.json"):
                         dst_wf = cloud_pdir / "workflows" / wf.name
                         if not dst_wf.exists():
                             shutil.copy2(wf, dst_wf)
-        print(f"[云端项目就绪] {cloud_pdir}")
+        print(f"[云端剧本项目就绪] {cloud_pdir}")
 
 
 def resolve_repo_path(
@@ -163,7 +185,6 @@ def download_file_to_drive(
     has_aria2 = shutil.which("aria2c") is not None
     tmp_drive_path = final_path.with_suffix(final_path.suffix + ".part")
 
-    # 直接下载到 Google Drive 的 .part 文件（开启断点续传，且不占用 /tmp 避免 61.7GB x 2 撑爆 107GB 本地盘）
     used_aria2 = False
     if has_aria2:
         aria_cmd = [
@@ -211,10 +232,10 @@ def download_file_to_drive(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="将开源视频模型包同步到 Google Drive 5TB")
+    parser = argparse.ArgumentParser(description="将开源视频模型包与剧本项目结构同步到 Google Drive 5TB")
     parser.add_argument("--manifest", default="configs/models_manifest.json", help="模型清单路径")
-    parser.add_argument("--repo-root", default=".", help="AI-Video 仓库根目录（用于同步 projects/ 剧本上云）")
-    parser.add_argument("--project", default="01_rainy_signal", help="同步初始化的项目 ID")
+    parser.add_argument("--repo-root", default=".", help="AI-Video 仓库根目录（用于同步 projects/ 剧本项目上云）")
+    parser.add_argument("--project", default="01_rainy_signal", help="同步初始化的剧本项目 ID")
     parser.add_argument("--drive-root", default=None, help="Google Drive 项目根目录")
     parser.add_argument("--packs", nargs="+", required=True, help="要同步的模型包 ID 列表，或传 all")
     parser.add_argument("--hf-token", default=os.environ.get("HF_TOKEN"), help="Hugging Face Token（下载受限模型时需要）")
@@ -260,7 +281,7 @@ def main() -> int:
                 force=args.force,
             )
 
-    print("\n[全部完成] 模型资源已存入 Google Drive，可切换至 H100 运行时直接生成！")
+    print("\n[全部完成] 模型资源与剧本项目已存入 Google Drive，可切换至 A100 运行时直接生成！")
     return 0
 
 

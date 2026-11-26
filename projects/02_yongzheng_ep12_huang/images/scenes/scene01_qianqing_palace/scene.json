@@ -1,0 +1,13 @@
+{
+  "scene_id": "scene01_qianqing_palace",
+  "title": "INT. 乾清宫大殿议储朝会 - 日",
+  "location_type": "INT",
+  "time_of_day": "DAY",
+  "spatial_anchor_en": "grand imperial Qianqing Palace hall from Yongzheng Dynasty Episode 12, towering vermilion lacquered pillars with coiled golden dragons, carved wooden throne dais, symmetrical rows of kneeling and standing court officials on polished stone floor",
+  "lighting_palette_en": "dramatic imperial palace chiaroscuro lighting, warm golden sunlight shafts cutting through incense smoke against deep crimson and amber interiors, 35mm anamorphic depth of field",
+  "base_ambience_en": "deep resonant palace hall room tone, subtle rustle of heavy silk court robes, tense political silence",
+  "reference_images": {
+    "master": "images/scenes/scene01_qianqing_palace/env_master.png",
+    "reverse_angle": "images/scenes/scene01_qianqing_palace/env_reverse.png"
+  }
+}

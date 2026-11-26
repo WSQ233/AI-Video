@@ -1,0 +1,30 @@
+{
+  "character_id": "marco_rubio",
+  "name": "鲁比奥",
+  "replaces_original_role": "佟国维 (Grand Secretary Tong Guowei)",
+  "gender": "male",
+  "age": 55,
+  "role": "上书房首辅 / 逼宫急先锋（替换《雍正王朝》第12集串联百官逼宫的佟国维）",
+  "visual_anchor_en": "55-year-old Hispanic-Caucasian male looking like Marco Rubio with neatly parted dark hair, expressive forehead lines, sharp intense eyes, and clean-shaven face, wearing a Qing Dynasty first-rank official dark crimson-navy court robe with embroidered official badge and red-tasseled court hat",
+  "face_anchor_en": "55-year-old male looking like Marco Rubio, neatly parted dark hair, sharp intense eyes, assertive facial expression, clean-shaven",
+  "wardrobe_en": "Qing Dynasty first-rank Grand Secretary court robe (Chaofu) with embroidered badge and court beads, replacing Tong Guowei in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with Marco Rubio's exact vocal timbre: sharp, rapid, high-energy clear tenor-baritone voice, assertive and confrontational political debater cadence",
+  "reference_images": {
+    "primary": "characters/marco_rubio/ref_marco_rubio.png",
+    "front_closeup": "characters/marco_rubio/ref_marco_rubio_front.png",
+    "half_body": "characters/marco_rubio/ref_marco_rubio_half.png",
+    "full_body": "characters/marco_rubio/ref_marco_rubio_full.png"
+  },
+  "outfits": {
+    "outfit_01_tong_guowei_court_robe": {
+      "label": "乾清宫首辅朝服造型（替换佟国维）",
+      "prompt_en": "wearing a Qing Dynasty first-rank Grand Secretary dark court robe with embroidered badge and court beads",
+      "reference_image": "characters/marco_rubio/outfits/outfit_01_tong_guowei_court_robe.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/marco_rubio/voice/voice_marco_rubio.wav",
+    "description": "3~8 秒鲁比奥清亮急促辩论音色参考干音（供 Ref2VA 声纹锁定中文配音音色）"
+  },
+  "notes": "在原视频+参考图直出工作流中直接替换佟国维，使用鲁比奥标志性清亮急促、极具攻击性的音色进行中文配音。"
+}

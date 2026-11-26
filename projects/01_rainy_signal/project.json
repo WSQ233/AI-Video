@@ -3,13 +3,58 @@
   "title": "雨夜信号 / Rainy Signal",
   "type": "test_short_film",
   "engine": "MiniMax-H3-33.1B-BF16",
+  "max_shot_duration_sec": 15,
+  "frame_grid_rule": "17k+5 @ 24fps (max 345 frames = 14.38s <= 15s)",
   "active_packs": [
     "minimax_h3_fl2va_bf16",
     "minimax_h3_ref2va_bf16",
     "minimax_h3_turbo_lora"
   ],
-  "resolution": "1280x720",
+  "resolution": "1344x768",
   "fps": 24,
   "shots": 3,
-  "cloud_dir": "/content/drive/MyDrive/AI_Video/projects/01_rainy_signal"
+  "cloud_dir": "/content/drive/MyDrive/AI_Video/projects/01_rainy_signal",
+  "structure": {
+    "source_script": "source_script.md",
+    "storyboard": "storyboard.md",
+    "tasks_csv": "tasks.csv",
+    "images_dir": "images",
+    "scenes_dir": "images/scenes",
+    "props_dir": "images/props",
+    "keyframes_dir": "images/keyframes",
+    "characters_dir": "characters",
+    "audio_dir": "audio",
+    "workflows_dir": "workflows",
+    "outputs_dir": "outputs",
+    "raw_batches_dir": "outputs/raw_batches",
+    "selected_shots_dir": "outputs/selected_shots",
+    "extracted_frames_dir": "outputs/extracted_frames",
+    "final_cut_dir": "outputs/final_cut",
+    "logs_dir": "logs"
+  },
+  "characters": [
+    {
+      "character_id": "linwan",
+      "name": "林晚",
+      "role": "女主角 / 信号调查员",
+      "folder": "characters/linwan",
+      "anchor_image": "characters/linwan/ref_linwan.png",
+      "outfits_dir": "characters/linwan/outfits",
+      "voice_dir": "characters/linwan/voice"
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "scene01_rainy_street",
+      "title": "EXT. 旧城区赛博雨夜长街 - 子夜",
+      "folder": "images/scenes/scene01_rainy_street",
+      "anchor_image": "images/scenes/scene01_rainy_street/env_master.png"
+    },
+    {
+      "scene_id": "scene02_midnight_cafe",
+      "title": "INT. MIDNIGHT CAFE 复古咖啡馆 - 子夜",
+      "folder": "images/scenes/scene02_midnight_cafe",
+      "anchor_image": "images/scenes/scene02_midnight_cafe/env_master.png"
+    }
+  ]
 }

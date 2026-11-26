@@ -1,0 +1,34 @@
+{
+  "character_id": "linwan",
+  "name": "林晚",
+  "gender": "female",
+  "age": 25,
+  "role": "女主角 / 加密信号调查员",
+  "visual_anchor_en": "a 25-year-old East Asian woman with shoulder-length wavy black hair wearing a beige trench coat",
+  "face_anchor_en": "25-year-old East Asian woman, shoulder-length wavy black hair, clear expressive dark eyes, delicate natural facial features",
+  "wardrobe_en": "classic beige long trench coat, minimalist inner dark knitwear, carrying a clear transparent umbrella",
+  "voice_anchor_en": "natural calm female voice, clear English pronunciation, composed and intimate tone",
+  "reference_images": {
+    "primary": "characters/linwan/ref_linwan.png",
+    "front_closeup": "characters/linwan/ref_linwan_front.png",
+    "half_body": "characters/linwan/ref_linwan_half.png",
+    "full_body": "characters/linwan/ref_linwan_full.png"
+  },
+  "outfits": {
+    "outfit_01_rain_trenchcoat": {
+      "label": "雨夜街头/初入咖啡馆（卡其色长风衣+透明雨伞）",
+      "prompt_en": "wearing a classic beige trench coat with subtle rain droplets on the shoulders, holding a clear transparent umbrella",
+      "reference_image": "characters/linwan/outfits/outfit_01_rain_trenchcoat.png"
+    },
+    "outfit_02_indoor_knitwear": {
+      "label": "室内安全屋/深色高领毛衣造型（备用换装）",
+      "prompt_en": "wearing a minimalist charcoal-gray ribbed turtleneck sweater",
+      "reference_image": "characters/linwan/outfits/outfit_02_indoor_knitwear.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/linwan/voice/voice_linwan.wav",
+    "description": "3~8 秒平静女声参考干音（可选供 Ref2VA <Audio 1> 声纹克隆绑定）"
+  },
+  "notes": "所有涉及林晚的 Ref2VA 分镜必须在 Prompt 开头声明 'Use <Picture 1> as character reference.' 并嵌入 visual_anchor_en（或对应场次 outfit 的 prompt_en），确保跨分镜骨相与穿搭 100% 一致。"
+}

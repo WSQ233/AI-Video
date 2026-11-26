@@ -1,0 +1,14 @@
+{
+  "scene_id": "scene02_midnight_cafe",
+  "title": "INT. MIDNIGHT CAFE 复古咖啡馆室内 - 子夜",
+  "location_type": "INT",
+  "time_of_day": "MIDNIGHT_RAIN",
+  "spatial_anchor_en": "inside a cozy vintage coffee shop lit by warm amber tungsten lamps, wooden glass entrance door with a brass shop bell, wooden espresso counter with rising steam from white ceramic cups, and a rain-streaked glass window overlooking the neon street",
+  "lighting_palette_en": "soft warm tungsten interior lighting contrasting with cool neon blue rain reflections on the window glass and cool blue smartphone screen light",
+  "base_ambience_en": "muffled outdoor rain tapping on glass, quiet vinyl lo-fi jazz playing indoors",
+  "reference_images": {
+    "master": "images/scenes/scene02_midnight_cafe/env_master.png",
+    "counter_angle": "images/scenes/scene02_midnight_cafe/env_counter.png",
+    "window_angle": "images/scenes/scene02_midnight_cafe/env_window.png"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "character_id": "jensen_huang",
+  "name": "黄仁勋",
+  "replaces_original_role": "太子胤礽 (Crown Prince Yinreng)",
+  "gender": "male",
+  "age": 61,
+  "role": "算力东宫储君（替换《雍正王朝》第12集废而复立的太子胤礽）",
+  "visual_anchor_en": "61-year-old East Asian male looking like Jensen Huang with silver-gray short swept hair and rimless rectangular glasses, wearing his signature black leather biker jacket layered with imperial apricot-yellow Qing Crown Prince dragon silk trim",
+  "face_anchor_en": "61-year-old East Asian male looking like Jensen Huang, silver-gray short swept hair, rimless rectangular glasses, calm visionary expression",
+  "wardrobe_en": "signature black leather biker jacket layered with imperial apricot-yellow Qing Dynasty Crown Prince dragon silk motifs, replacing Crown Prince Yinreng in the original video",
+  "voice_anchor_en": "speaking in Mandarin Chinese with Jensen Huang's exact vocal timbre: warm, magnetic, calm mid-baritone voice with a slight Taiwanese-Mandarin gentle inflection and confident tech-leader cadence",
+  "reference_images": {
+    "primary": "characters/jensen_huang/ref_jensen_huang.png",
+    "front_closeup": "characters/jensen_huang/ref_jensen_huang_front.png",
+    "half_body": "characters/jensen_huang/ref_jensen_huang_half.png",
+    "full_body": "characters/jensen_huang/ref_jensen_huang_full.png"
+  },
+  "outfits": {
+    "outfit_01_leather_crown_prince": {
+      "label": "黑皮衣叠穿杏黄太子龙纹朝袍造型（替换太子胤礽）",
+      "prompt_en": "wearing his signature black leather biker jacket layered with imperial apricot-yellow Qing Crown Prince dragon silk trim",
+      "reference_image": "characters/jensen_huang/outfits/outfit_01_leather_crown_prince.png"
+    }
+  },
+  "voice_reference": {
+    "primary_wav": "characters/jensen_huang/voice/voice_jensen_huang.wav",
+    "description": "3~8 秒黄仁勋沉稳演讲人声参考干音（供 Ref2VA <Audio 1> 声纹锁定）"
+  },
+  "notes": "在原视频+参考图直出工作流中绑定为 <Picture 2>，替换 <Video 1> 中的废太子胤礽，呈现算力储君废而复立的核心戏剧张力。"
+}
