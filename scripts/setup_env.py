@@ -20,6 +20,18 @@ import time
 from pathlib import Path
 from typing import Any
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from drive_fast_io import (  # noqa: E402
+    DEFAULT_DOWNLOAD_WORKERS,
+    GoogleDriveClient,
+    copy_file_fast,
+    drive_path_to_rel_parts,
+    try_create_drive_client,
+)
+
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".webm", ".avi"}
@@ -148,12 +160,41 @@ def copy_one_file(src: Path, dst: Path) -> str:
     if dst.exists() and dst.stat().st_size == src.stat().st_size:
         return f"跳过(本地已有): {dst.name}"
     t0 = time.time()
-    tmp = dst.with_suffix(dst.suffix + ".part")
-    shutil.copy2(src, tmp)
-    os.replace(tmp, dst)
+    copy_file_fast(src, dst)
     gb = dst.stat().st_size / (1024 ** 3)
     dt = time.time() - t0
-    return f"已拷入本地SSD: {dst.name} ({gb:.2f} GB, {dt:.1f}s)"
+    speed_mb = (dst.stat().st_size / (1024 ** 2)) / max(dt, 0.1)
+    return f"已拷入本地SSD (DriveFS): {dst.name} ({gb:.2f} GB, {dt:.1f}s, ~{speed_mb:.1f} MB/s)"
+
+
+def stage_one_file(
+    *,
+    sub: str,
+    fname: str,
+    src: Path,
+    dst: Path,
+    drive_client: GoogleDriveClient | None,
+    drive_models_rel_parts: list[str] | None,
+    stage_backend: str,
+    range_workers: int,
+) -> str:
+    if drive_client is not None and drive_models_rel_parts is not None:
+        try:
+            res = drive_client.download_file_to_local(
+                folder_parts=[*drive_models_rel_parts, sub],
+                filename=fname,
+                local_dst=dst,
+                workers=range_workers,
+            )
+            if res["status"] == "skipped":
+                return f"跳过(本地已有精确匹配): {dst.name}"
+            gb = res["size"] / (1024 ** 3)
+            return f"已直下本地SSD (Drive API): {dst.name} ({gb:.2f} GB, {res['elapsed']:.1f}s, ~{res['avg_mb_s']:.1f} MB/s)"
+        except Exception as exc:
+            if stage_backend == "drive_api" or not src.exists():
+                raise
+            print(f"  [回退 DriveFS] {fname} API 直下失败 ({exc})，切换本地拷贝...", flush=True)
+    return copy_one_file(src, dst)
 
 
 def stage_models_from_drive(
@@ -163,8 +204,10 @@ def stage_models_from_drive(
     comfy_dir: Path,
     mode: str,
     workers: int,
+    stage_backend: str = "auto",
+    range_workers: int = DEFAULT_DOWNLOAD_WORKERS,
 ) -> list[str]:
-    """按选定 pack 将模型从 5TB Google Drive 共享模型库准备到本地 ComfyUI/models。"""
+    """按选定 pack 将模型从 5TB Google Drive 共享模型库高速预热到本地 ComfyUI/models。"""
     drive_models = shared_models_dir
     local_models = comfy_dir / "models"
     missing: list[str] = []
@@ -176,7 +219,14 @@ def stage_models_from_drive(
             ensure_symlink(local_models / sub, drive_models / sub)
         return missing
 
-    jobs: list[tuple[Path, Path]] = []
+    drive_models_rel_parts = drive_path_to_rel_parts(drive_models)
+    drive_client: GoogleDriveClient | None = None
+    if stage_backend in ("auto", "drive_api") and drive_models_rel_parts is not None:
+        drive_client = try_create_drive_client(verbose=True)
+        if drive_client is None and stage_backend == "drive_api":
+            raise RuntimeError("已指定 --stage-backend=drive_api，但未检测到可用的 Google Drive OAuth 凭证。")
+
+    jobs: list[tuple[str, str, Path, Path]] = []
     seen: set[tuple[str, str]] = set()
     for pid in packs:
         pack = manifest["packs"].get(pid)
@@ -197,17 +247,48 @@ def stage_models_from_drive(
             src = drive_models / sub / fname
             dst = local_models / sub / fname
             if not src.exists():
-                missing.append(f"{sub}/{fname}")
-                continue
-            jobs.append((src, dst))
+                # 若 DriveFS 尚未刷出最新同步文件，优先用 Drive API 核验是否存在
+                if drive_client is not None and drive_models_rel_parts is not None:
+                    fid = drive_client.find_folder_path([*drive_models_rel_parts, sub])
+                    if not fid or not drive_client.list_files_in_folder(fid, fname):
+                        missing.append(f"{sub}/{fname}")
+                        continue
+                else:
+                    missing.append(f"{sub}/{fname}")
+                    continue
+            jobs.append((sub, fname, src, dst))
 
     if jobs:
-        print(f"\n[高速预热] 并行拷入 {len(jobs)} 个模型文件到 Colab 本地 SSD (workers={workers})...")
+        if drive_client is not None:
+            file_workers = min(2, max(1, workers), len(jobs))
+            print(
+                f"\n[API极速预热] 绕过 DriveFS，并发直下 {len(jobs)} 个模型文件到 Colab 本地 SSD "
+                f"(file_workers={file_workers}, range_workers={range_workers}/文件，零 DriveFS 缓存膨胀)...",
+                flush=True,
+            )
+        else:
+            file_workers = min(max(1, workers), len(jobs))
+            print(f"\n[高速预热] 并行拷入 {len(jobs)} 个模型文件到 Colab 本地 SSD (DriveFS, workers={file_workers})...", flush=True)
+
         t0 = time.time()
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-            for msg in ex.map(lambda p: copy_one_file(p[0], p[1]), jobs):
-                print(f"  {msg}")
-        print(f"[预热完成] 总耗时 {time.time() - t0:.1f}s")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=file_workers) as ex:
+            futs = [
+                ex.submit(
+                    stage_one_file,
+                    sub=sub,
+                    fname=fname,
+                    src=src,
+                    dst=dst,
+                    drive_client=drive_client,
+                    drive_models_rel_parts=drive_models_rel_parts,
+                    stage_backend=stage_backend,
+                    range_workers=range_workers,
+                )
+                for sub, fname, src, dst in jobs
+            ]
+            for fut in concurrent.futures.as_completed(futs):
+                print(f"  {fut.result()}", flush=True)
+        print(f"[预热完成] 总耗时 {time.time() - t0:.1f}s", flush=True)
 
     return missing
 
@@ -293,6 +374,18 @@ def main() -> int:
     parser.add_argument("--project", default=None, help="本次挂载的独立剧本项目 ID（如 01_rainy_signal）")
     parser.add_argument("--packs", nargs="*", default=None, help="本次预热的模型包 ID")
     parser.add_argument("--mode", choices=["copy_to_local", "symlink"], default=None, help="模型加载模式")
+    parser.add_argument(
+        "--stage-backend",
+        choices=["auto", "drive_api", "drivefs"],
+        default="auto",
+        help="本地预热引擎：auto(优先 Drive API 多线程 Range 直下，零缓存膨胀，失败自动回退 DriveFS) / drive_api / drivefs",
+    )
+    parser.add_argument(
+        "--range-workers",
+        type=int,
+        default=DEFAULT_DOWNLOAD_WORKERS,
+        help="Drive API 单文件多线程 Range 分片并发数（默认 8）",
+    )
     parser.add_argument("--enable-ltx", action="store_true", help="强制启用 ComfyUI-LTXVideo 节点")
     parser.add_argument("--sageattention", action="store_true", help="安装 SageAttention 2.x (可选提速)")
     args = parser.parse_args()
@@ -368,6 +461,8 @@ def main() -> int:
         comfy_dir=comfy_dir,
         mode=mode,
         workers=workers,
+        stage_backend=args.stage_backend,
+        range_workers=args.range_workers,
     )
     write_extra_model_paths(comfy_dir, shared_models_dir)
 

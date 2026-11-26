@@ -29,8 +29,9 @@ description: >-
 
 ## 2. Google Drive 挂载与 OAuth 弹窗自动化
 
-1. **首次执行 `drive.mount('/content/drive')`**：
-   - 点击单元格「运行单元」后等待 5~8 秒，若弹出站内确认框（「允许此笔记本访问您的 Google 云端硬盘文件？」），点击 `连接到 Google 云端硬盘`。
+1. **首次执行 `drive.mount('/content/drive')` 与 `auth.authenticate_user()`（Drive API Turbo）**：
+   - `00`/`01`/`02` Notebook 默认开启 `USE_DRIVE_API_TURBO = True`，在挂载 Drive 后会触发一次 Colab `auth.authenticate_user()` OAuth 授权，以绕过 DriveFS FUSE 瓶颈，启用 **Google Drive v3 API 零落盘流水线直传（HF → Drive）** 与 **多线程 HTTP Range 分片直下（Drive → A100 SSD）**。
+   - 点击单元格「运行单元」后等待 5~8 秒，若弹出站内确认框（「允许此笔记本访问您的 Google 云端硬盘文件？」或「允许此笔记本访问您的 Google 凭据？」），依次点击确认。
 2. **跨标签页接管 Google OAuth 授权**：
    - 立即调用 `list_pages` 查找 URL 含 `accounts.google.com/signin/oauth` 的新弹窗 `pageId`。
    - 对该 OAuth `pageId` 调用 `take_snapshot`：
@@ -54,8 +55,9 @@ description: >-
      }
      ```
 2. **预热进度监控（阶段 2 `setup_env.py`）**：
-   - `copy_to_local` 从 `/content/drive` 拷入 ~92.4GB 模型时，DriveFS 会在本地 `/` 产生临时读取缓存（峰值磁盘占用可达 `140~153 GB / 235.68 GB`，完成后回落至 `~95 GB`）。
-   - **单次只允许预热 1 套 61.7GB BF16 主模型包**（如 `minimax_h3_fl2va_bf16 minimax_h3_turbo_lora`），切勿同时把 `fl2va_bf16` 与 `ref2va_bf16` 一起 `copy_to_local`，否则会撑爆 235GB 本地 SSD。
+   - **首选 Drive API Turbo 模式（默认 `STAGE_BACKEND="auto"`）**：绕过 DriveFS 直接通过 Google Drive v3 API 多线程 HTTP Range 分片拉取到本地 NVMe SSD，**不产生 DriveFS 读取缓存膨胀**，预热 ~92.4GB 模型时本地盘占用仅稳定增长至 ~95 GB，且大幅缩短 A100 启动耗卡时间。
+   - **DriveFS 回退模式**：若未启用或降级到 DriveFS，`copy_to_local` 从 `/content/drive` 拷入 ~92.4GB 模型时会在本地 `/` 产生临时读取缓存（峰值磁盘占用可达 `140~153 GB / 235.68 GB`，完成后回落至 `~95 GB`）。
+   - **单次只允许预热 1 套 61.7GB BF16 主模型包**（如 `minimax_h3_fl2va_bf16 minimax_h3_turbo_lora`），切勿同时把 `fl2va_bf16` 与 `ref2va_bf16` 一起 `copy_to_local`，否则仍可能逼近 235GB 本地 SSD 上限。
    - 轮询期间必须使用 `schedule` 定时器（间隔 60~180 秒）配合 `take_snapshot` 观察顶栏 `RAM / 磁盘` 指标与底部状态栏，禁止高频空转轮询。
 3. **无头 ComfyUI 实时日志追踪（阶段 3）**：
    - 启动 `main.py` 后台进程时加上 `python -u`，并启动后台 daemon 线程实时 tail `logs/comfyui_headless.log` 输出到单元格 stdout，以便第一时间通过 `take_snapshot` 捕获模型加载状态、8 步采样进度 (`1/8 .. 8/8`) 与任何启动报错。
@@ -95,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state f547f8e94aa5f9f499cb00198d558fd68853e164b9bc29c03fc0fc5614660f28 -->
+<!-- pipeline-baseline:state d27402cd6848d921ca4e0132983563435c10dc32761165859843127624d63393 -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 
@@ -131,9 +133,9 @@ description: >-
 
 | Notebook 文件 | 标题与职责 | 暴露表单参数 (`#@param`) |
 | :--- | :--- | :--- |
-| `notebooks/00_sync_models_to_drive.ipynb` | 00 · 纯云端同步 MiniMax H3 满血模型 + 初始化独立项目目录到 5TB Google Drive | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `PROJECT_ID="01_rainy_signal"`, `MINIMAX_H3_FL2VA_BF16_FULL=True`, `MINIMAX_H3_REF2VA_BF16_FULL=False`, `MINIMAX_H3_TURBO_LORA=True`, `MINIMAX_H3_FL2VA_INT8_FULL=False`, `MINIMAX_H3_REF2VA_INT8_FULL=False`, `QWEN3VL_BF16_OPTIONAL=False`, `FLUX2_KEYFRAME=False`, `FORCE_REDOWNLOAD=False`, `HF_TOKEN_INPUT=""` |
-| `notebooks/01_h100_comfyui_webui.ipynb` | 01 · Colab A100 80GB 启动 ComfyUI WebUI（按独立项目挂载云端资产） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False` |
-| `notebooks/02_h100_batch_runner.ipynb` | 02 · Colab A100 80GB 无头批处理量产（按独立项目隔离 + 断点续传 + 自动关机防烧卡） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False`, `BATCH_NAME=""`, `AUTO_DISCONNECT=True` |
+| `notebooks/00_sync_models_to_drive.ipynb` | 00 · 纯云端高速同步 MiniMax H3 满血模型 + 初始化独立项目目录到 5TB Google Drive | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `MINIMAX_H3_FL2VA_BF16_FULL=True`, `MINIMAX_H3_REF2VA_BF16_FULL=False`, `MINIMAX_H3_TURBO_LORA=True`, `MINIMAX_H3_FL2VA_INT8_FULL=False`, `MINIMAX_H3_REF2VA_INT8_FULL=False`, `QWEN3VL_BF16_OPTIONAL=False`, `TRANSFER_MODE="auto"`, `FILE_WORKERS=2`, `FETCH_WORKERS=8`, `UPLOAD_CHUNK_MB=64`, `FORCE_REDOWNLOAD=False`, `HF_TOKEN_INPUT=""` |
+| `notebooks/01_h100_comfyui_webui.ipynb` | 01 · Colab A100 80GB 启动 ComfyUI WebUI（按独立项目挂载云端资产） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=8`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False` |
+| `notebooks/02_h100_batch_runner.ipynb` | 02 · Colab A100 80GB 无头批处理量产（按独立项目隔离 + Drive API 极速预热 + 自动关机防烧卡） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=8`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False`, `BATCH_NAME=""`, `AUTO_DISCONNECT=True` |
 
 ### 6.5 控制脚本与 CLI 参数 (`scripts/*.py`)
 
@@ -141,13 +143,14 @@ description: >-
 | :--- | :--- |
 | `scripts/assemble_film.py` | `--project-dir`, `--batch-name`, `--output-name`, `--normalize-audio`, `--dry-run` |
 | `scripts/batch_runner.py` | `--tasks-csv`, `--workflows-dir`, `--shared-workflows-dir`, `--output-dir`, `--project-dir`, `--comfy-input-dir`, `--batch-name`, `--only-tasks`, `--server`, `--timeout` |
+| `scripts/drive_fast_io.py` | 位置参数 / 无可选标志 |
 | `scripts/extract_anchor_frame.py` | `--project-dir`, `--video`, `--timestamp`, `--last-frame`, `--character`, `--outfit`, `--scene`, `--keyframe-name`, `--out` |
 | `scripts/fetch_character_refs.py` | `--project-dir`, `--characters`, `--force` |
 | `scripts/freeze_locks.py` | `--comfy-dir`, `--lock-file`, `--out` |
 | `scripts/new_project.py` | `--characters`, `--scenes`, `--repo-root`, `--drive-root`, `--source-video-url` |
 | `scripts/prepare_source_video.py` | `--project-dir`, `--source-url`, `--source-video`, `--skip-download`, `--dry-run` |
-| `scripts/setup_env.py` | `--repo-root`, `--project`, `--packs`, `--mode`, `--enable-ltx`, `--sageattention` |
-| `scripts/sync_models_to_drive.py` | `--manifest`, `--repo-root`, `--project`, `--drive-root`, `--packs`, `--hf-token`, `--force`, `--list` |
+| `scripts/setup_env.py` | `--repo-root`, `--project`, `--packs`, `--mode`, `--stage-backend`, `--range-workers`, `--enable-ltx`, `--sageattention` |
+| `scripts/sync_models_to_drive.py` | `--manifest`, `--repo-root`, `--project`, `--drive-root`, `--packs`, `--hf-token`, `--transfer-mode`, `--file-workers`, `--fetch-workers`, `--upload-chunk-mb`, `--force`, `--list` |
 | `scripts/validate_storyboard.py` | `--repo-root`, `--project`, `--max-seconds` |
 
 ### 6.6 共享 ComfyUI 工作流模板 (`workflows/shared/*.json`)
