@@ -199,6 +199,11 @@ def main() -> int:
     parser.add_argument("--comfy-input-dir", default="/content/ComfyUI/input", help="ComfyUI input 挂载目录")
     parser.add_argument("--batch-name", default=None, help="批次目录名（默认按日期生成）")
     parser.add_argument("--only-tasks", nargs="*", default=None, help="可选：仅执行指定的 task_id 列表（如阶段 A 定妆立锚镜）")
+    parser.add_argument(
+        "--override-unet",
+        default="",
+        help="可选：运行时覆盖 UNETLoader 的主模型文件名（仅允许 33.1B 未剪枝模型，如 minimax_h3_ref2va_int8_convrot.safetensors）",
+    )
     parser.add_argument("--server", default="http://127.0.0.1:8188", help="ComfyUI API 地址")
     parser.add_argument("--timeout", type=int, default=1800, help="单条任务超时时间（秒）")
     args = parser.parse_args()
@@ -212,6 +217,12 @@ def main() -> int:
     workflows_dir = Path(args.workflows_dir)
     shared_workflows_dir = Path(args.shared_workflows_dir) if args.shared_workflows_dir else None
     only_filter = set(args.only_tasks) if args.only_tasks else None
+    override_unet = (args.override_unet or "").strip()
+    if override_unet:
+        low_unet = override_unet.lower()
+        if "pruned" in low_unet or low_unet.endswith(".gguf"):
+            raise ValueError(f"禁止覆盖为剪枝版或 GGUF 模型（仅允许 33.1B 未剪枝模型）: {override_unet}")
+        print(f"[主模型覆盖] 运行时将统一使用 33.1B 未剪枝权重: {override_unet}")
 
     wait_server_ready(args.server)
     completed = load_completed_ids(manifest_path)
@@ -284,6 +295,12 @@ def main() -> int:
 
         template_obj = json.loads(wf_path.read_text(encoding="utf-8"))
         prompt_graph = render_workflow(template_obj, replacements)
+        if override_unet and isinstance(prompt_graph, dict):
+            for node in prompt_graph.values():
+                if isinstance(node, dict) and node.get("class_type") == "UNETLoader":
+                    node_inputs = node.get("inputs")
+                    if isinstance(node_inputs, dict) and "unet_name" in node_inputs:
+                        node_inputs["unet_name"] = override_unet
 
         print(
             f"[{idx}/{total}] 开始执行 {task_id} "
