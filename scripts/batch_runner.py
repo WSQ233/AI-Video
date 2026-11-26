@@ -25,8 +25,12 @@ def http_json(url: str, payload: dict[str, Any] | None = None, timeout: int = 30
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
     headers = {"Content-Type": "application/json"} if data is not None else {}
     req = urllib.request.Request(url, data=data, headers=headers)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"HTTP {exc.code} {exc.reason}: {body}") from exc
 
 
 def wait_server_ready(base_url: str, timeout_sec: int = 180) -> None:

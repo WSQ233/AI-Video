@@ -14,31 +14,31 @@
   "copy_workers": 4,
   "gpu_profiles": {
     "A100_80GB": {
-      "comfyui_args": "--normalvram --bf16-vae --listen 127.0.0.1 --port 8188",
+      "comfyui_args": "--bf16-vae --cache-none --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
       "recommended_packs": ["minimax_h3_fl2va_bf16", "minimax_h3_ref2va_bf16", "minimax_h3_turbo_lora", "minimax_h3_fl2va_int8_full"],
-      "note": "A100 80GB 满血高配：使用 --normalvram 让 Qwen3-VL 编码后自动卸载，把完整 80GB HBM2e 独享给 61.7GB 的 33.1B 未剪枝 BF16 主模型，零 OOM 满速跑！"
+      "note": "A100 80GB 满血高配：默认 NORMAL_VRAM + --cache-none 让 Qwen3-VL 编码后自动卸载释放，把完整 80GB HBM2e 独享给 61.7GB 的 33.1B 未剪枝 BF16 主模型，零 OOM 满速跑！"
     },
     "H100": {
-      "comfyui_args": "--normalvram --bf16-vae --listen 127.0.0.1 --port 8188",
+      "comfyui_args": "--bf16-vae --cache-none --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
       "recommended_packs": ["minimax_h3_fl2va_bf16", "minimax_h3_ref2va_bf16", "minimax_h3_turbo_lora"],
       "note": "H100 80GB 同等满血高配"
     },
     "A100_40GB": {
-      "comfyui_args": "--normalvram --bf16-vae --listen 127.0.0.1 --port 8188",
+      "comfyui_args": "--bf16-vae --cache-none --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
       "recommended_packs": ["minimax_h3_fl2va_int8_full", "minimax_h3_turbo_lora"],
-      "note": "A100 40GB 回退配置：使用 33.1B 完整未剪枝 INT8-ConvRot (~31.7GB)"
+      "note": "A100 40GB 配置：默认 NORMAL_VRAM + --cache-none 使 Qwen3-VL (25.3GB) 编码后立即从系统内存释放，避免与 61.7GB BF16 主模型叠加触发 83.5GB RAM OOM"
     },
     "L4": {
-      "comfyui_args": "--normalvram --listen 127.0.0.1 --port 8188",
+      "comfyui_args": "--cache-none --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
       "recommended_packs": ["minimax_h3_fl2va_int8_full"],
       "note": "L4 兼容配置"
     },
     "DEFAULT": {
-      "comfyui_args": "--normalvram --listen 127.0.0.1 --port 8188",
+      "comfyui_args": "--cache-none --listen 127.0.0.1 --port 8188",
       "install_sageattention": false,
       "recommended_packs": ["minimax_h3_fl2va_int8_full"],
       "note": "通用兜底配置"
