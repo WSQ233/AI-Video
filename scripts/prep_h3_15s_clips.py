@@ -51,8 +51,8 @@ def main() -> int:
         default="/content/AI-Video",
         help="代码仓库根目录",
     )
-    parser.add_argument("--width", type=int, default=1280)
-    parser.add_argument("--height", type=int, default=704)
+    parser.add_argument("--width", type=int, default=960)
+    parser.add_argument("--height", type=int, default=544)
     parser.add_argument("--fps", type=int, default=24)
     args = parser.parse_args()
 

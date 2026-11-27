@@ -78,7 +78,7 @@
       "width": "__WIDTH__",
       "height": "__HEIGHT__",
       "length": "__FRAMES__",
-      "ref_image_size": "max"
+      "ref_image_size": "match"
     }
   },
   "7": {

@@ -99,6 +99,10 @@ def main() -> int:
     for flag in ("--bf16-vae", "--cache-none"):
         if flag not in comfy_args:
             comfy_args.append(flag)
+    if vram_gb < 35.0:
+        for flag in ("--lowvram", "--disable-pinned-memory"):
+            if flag not in comfy_args:
+                comfy_args.append(flag)
 
     log_file = project_dir / "logs" / f"comfyui_{args.batch_name}.log"
     log_file.parent.mkdir(parents=True, exist_ok=True)
@@ -155,7 +159,7 @@ def main() -> int:
     concat_inputs = []
     for i in range(len(shot_files)):
         filter_parts.append(
-            f"[{i}:v]fps=24,scale=1280:704:flags=lanczos,setsar=1,format=yuv420p[v{i}]"
+            f"[{i}:v]fps=24,scale=960:544:flags=lanczos,setsar=1,format=yuv420p[v{i}]"
         )
         filter_parts.append(
             f"[{i}:a]aresample=32000:async=1,aformat=channel_layouts=stereo[a{i}]"
