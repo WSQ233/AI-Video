@@ -67,6 +67,26 @@ def align_lines_to_whisper(
     将改编剧本中的每一句台词（shot01..shot21）按顺序对齐到原片 Whisper 识别出的真实时间戳。
     使用顺序单调窗口 + 中文关键词/编辑距离综合打分，确保无倒序且紧密贴合原演员开口时间。
     """
+    # 若 plan 中已给出逐句精校后的 fixed_start / fixed_end，直接采用毫秒级精校时间窗
+    if all("fixed_start" in ln and "fixed_end" in ln for ln in plan_lines):
+        aligned_fixed: list[dict[str, Any]] = []
+        for ln in plan_lines:
+            ts = float(ln["fixed_start"])
+            te = float(ln["fixed_end"])
+            aligned_fixed.append({
+                "id": ln["id"],
+                "speaker": ln["speaker"],
+                "orig_role": ln["orig_role"],
+                "start": round(ts, 3),
+                "end": round(te, 3),
+                "duration": round(te - ts, 3),
+                "match_score": 1.0,
+                "orig_text": ln.get("orig_hint", ""),
+                "adapted_text": ln["adapted_text"],
+            })
+        clip_end_fixed = min(max_sec, aligned_fixed[-1]["end"] + 0.35)
+        return aligned_fixed, round(clip_end_fixed, 3)
+
     n_segs = len(whisper_segs)
     if n_segs == 0:
         raise RuntimeError("Whisper 未识别到任何原片中文台词，请检查原片音频轨！")
@@ -192,32 +212,37 @@ def stage_analyze(project_dir: Path, plan: dict[str, Any], work_dir: Path) -> No
         shutil.copy2(stem_dir / "no_vocals.wav", bg_wav)
     print(f"[Demucs 完成] 人声: {vocals_wav} | 原片环境配乐: {bg_wav}", flush=True)
 
-    # Faster-Whisper large-v3 逐句中文识别与自动对齐（直接读原片全频带音轨并关闭前文条件，彻底杜绝字幕幻觉）
-    print("\n[Stage 1.3] 使用 Faster-Whisper large-v3 提取原片逐句中文时间戳...", flush=True)
-    wmodel = WhisperModel("large-v3", device="cuda", compute_type="float16")
-    segs_iter, info = wmodel.transcribe(
-        str(orig_wav),
-        language="zh",
-        beam_size=5,
-        condition_on_previous_text=False,
-        no_speech_threshold=0.65,
-        compression_ratio_threshold=2.0,
-        vad_filter=True,
-        vad_parameters={"min_silence_duration_ms": 220, "threshold": 0.35},
-        initial_prompt="雍正王朝第12集乾清宫议举新太子：朕今天和你们一道议举新太子，在京四品以上外省二品以上，佟国维、马齐、张廷玉、二阿哥胤礽、王掞、托合齐、耿索图、凌普。",
-    )
-    bad_hallucinations = ("请不吝点赞", "明镜", "点点栏目", "字幕由", "感谢观看")
-    whisper_segs = [
-        {"start": round(s.start, 3), "end": round(s.end, 3), "text": s.text.strip()}
-        for s in segs_iter
-        if s.text.strip() and not any(b in s.text for b in bad_hallucinations)
-    ]
-    (work_dir / "orig_transcript.json").write_text(
-        json.dumps(whisper_segs, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-    print(f"[Whisper 完成] 共识别 {len(whisper_segs)} 段原片台词：", flush=True)
-    for ws in whisper_segs:
-        print(f"  [{ws['start']:6.2f}s - {ws['end']:6.2f}s] {ws['text']}", flush=True)
+    # 若计划表已锁定逐句毫秒时间窗，跳过重复 Whisper 识别直接精校对齐
+    if all("fixed_start" in ln and "fixed_end" in ln for ln in plan["lines"]):
+        print("\n[Stage 1.3] 检测到毫秒级精校时间窗，直接按固定时间轴对齐（零漂移）...", flush=True)
+        whisper_segs = []
+    else:
+        # Faster-Whisper large-v3 逐句中文识别与自动对齐（直接读原片全频带音轨并关闭前文条件，彻底杜绝字幕幻觉）
+        print("\n[Stage 1.3] 使用 Faster-Whisper large-v3 提取原片逐句中文时间戳...", flush=True)
+        wmodel = WhisperModel("large-v3", device="cuda", compute_type="float16")
+        segs_iter, info = wmodel.transcribe(
+            str(orig_wav),
+            language="zh",
+            beam_size=5,
+            condition_on_previous_text=False,
+            no_speech_threshold=0.65,
+            compression_ratio_threshold=2.0,
+            vad_filter=True,
+            vad_parameters={"min_silence_duration_ms": 220, "threshold": 0.35},
+            initial_prompt="雍正王朝第12集乾清宫议举新太子：朕今天和你们一道议举新太子，在京四品以上外省二品以上，佟国维、马齐、张廷玉、二阿哥胤礽、王掞、托合齐、耿索图、凌普。",
+        )
+        bad_hallucinations = ("请不吝点赞", "明镜", "点点栏目", "字幕由", "感谢观看")
+        whisper_segs = [
+            {"start": round(s.start, 3), "end": round(s.end, 3), "text": s.text.strip()}
+            for s in segs_iter
+            if s.text.strip() and not any(b in s.text for b in bad_hallucinations)
+        ]
+        (work_dir / "orig_transcript.json").write_text(
+            json.dumps(whisper_segs, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(f"[Whisper 完成] 共识别 {len(whisper_segs)} 段原片台词：", flush=True)
+        for ws in whisper_segs:
+            print(f"  [{ws['start']:6.2f}s - {ws['end']:6.2f}s] {ws['text']}", flush=True)
 
     aligned, clip_end = align_lines_to_whisper(plan["lines"], whisper_segs, trim_max - trim_start)
     # 严格贴合用户要求在 4:11 (251s) 处收尾，防止漏出 4:10.5 之后的「佟国维」
@@ -391,6 +416,12 @@ def stage_analyze(project_dir: Path, plan: dict[str, Any], work_dir: Path) -> No
             sheet.paste(im, ((ci + 1) * tile + 4, y0 + 4))
     sheet_path = work_dir / "actor_clusters.jpg"
     sheet.save(sheet_path, quality=90)
+    # 同步保存一份到 5TB Drive 便于本机远程核验聚类映射
+    debug_dir = project_dir / "outputs" / "replace_debug"
+    debug_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(sheet_path, debug_dir / "actor_clusters.jpg")
+    shutil.copy2(work_dir / "actor_face_map.json", debug_dir / "actor_face_map.json")
+    shutil.copy2(work_dir / "aligned_dub_timeline.json", debug_dir / "aligned_dub_timeline.json")
     print(f"[人脸聚类完成] 共识别 {len(cluster_meta)} 个稳定角色，对照图: {sheet_path}", flush=True)
     for cm in cluster_meta[:10]:
         print(f"  Cluster #{cm['cluster_id']:2d} (n={cm['count']:3d}) -> {cm['target']}", flush=True)
