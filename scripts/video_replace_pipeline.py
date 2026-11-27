@@ -763,8 +763,7 @@ def stage_faceswap(project_dir: Path, plan: dict[str, Any], work_dir: Path, shar
             raise RuntimeError(f"无法从参考图提取人脸向量: {img_rels}")
         avg_emb = np.mean(np.stack(embs, axis=0), axis=0)
         avg_emb = avg_emb / (np.linalg.norm(avg_emb) + 1e-8)
-        base_face.embedding = avg_emb * np.linalg.norm(base_face.embedding)
-        base_face.normed_embedding = avg_emb
+        base_face["embedding"] = avg_emb * float(np.linalg.norm(base_face.embedding))
         return base_face
 
     source_faces: dict[str, Any] = {}
