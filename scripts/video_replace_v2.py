@@ -212,14 +212,10 @@ def stage_dub(
     voice_refs = prepare_voice_refs(project_dir, plan, work_dir, needed_speakers)
 
     sys.path.insert(0, str(indextts_dir))
+    # 严格按权重版本匹配推理类（IndexTeam/IndexTTS-2 必须使用 indextts.infer_v2，绝不可混用 infer_v2_5 导致权重跳过！）
+    from indextts.infer_v2 import IndexTTS2 as _TTS  # type: ignore
     is_v25 = False
-    try:
-        from indextts.infer_v2_5 import IndexTTS2 as _TTS  # type: ignore
-        is_v25 = True
-        print("[Stage 1.2] 加载 IndexTTS-2.5 播音级清晰中文克隆引擎...", flush=True)
-    except Exception:
-        from indextts.infer_v2 import IndexTTS2 as _TTS  # type: ignore
-        print("[Stage 1.2] 加载 IndexTTS-2 播音级清晰中文克隆引擎...", flush=True)
+    print("[Stage 1.2] 加载 IndexTTS-2 播音级清晰中文克隆引擎 (infer_v2 严格匹配权重)...", flush=True)
 
     cfg_path = ckpt_dir / "config.yaml"
     init_sig = inspect.signature(_TTS.__init__).parameters
