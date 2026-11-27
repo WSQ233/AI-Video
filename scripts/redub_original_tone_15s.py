@@ -220,6 +220,8 @@ def ensure_deps(seed_vc_dir: Path, indextts_dir: Path) -> None:
             shutil.rmtree(indextts_dir)
         run_cmd(["git", "clone", "--depth", "1", "https://github.com/index-tts/index-tts.git", str(indextts_dir)])
     for pkg, mod in [
+        ("openai-whisper", "whisper"),
+        ("tiktoken", "tiktoken"),
         ("cn2an", "cn2an"),
         ("g2p-en", "g2p_en"),
         ("jieba", "jieba"),
@@ -403,7 +405,8 @@ def main() -> int:
         print(f"  {c['start']:5.2f}s-{c['end']:5.2f}s: {c['ch']}", flush=True)
 
     # 定位 5 处原片分句和待替换专有名词的时间区间（对 C0/C1 单独再跑一次短窗识别，避免长窗漏识）
-    c0_s, c0_e = 1.45, 4.45
+    c0_s, c0_e = 1.45, 4.65
+    kangxi_ref = save_wav(work_dir / "orig_kangxi_ref.wav", orig_vocals[int(c0_s * SR):int(c0_e * SR)], SR)
     c0_chars = transcribe_chars(wmodel, kangxi_ref, initial_prompt="为什么没有二阿哥胤礽的荐章啊？")
     c0_chars = [{"ch": c["ch"], "start": c["start"] + c0_s, "end": c["end"] + c0_s} for c in c0_chars]
     print("[C0 康熙短窗字级识别]:", [(round(c["start"], 2), round(c["end"], 2), c["ch"]) for c in c0_chars], flush=True)
