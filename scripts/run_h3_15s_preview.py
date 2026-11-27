@@ -123,6 +123,9 @@ def main() -> int:
             "--batch-name", args.batch_name,
             "--override-unet", override_unet,
         ]
+        if vram_gb < 35.0:
+            print(f"[显存保护] 检测到 {vram_gb:.1f}GB 显存 (<35GB)，自动启用 --tiled-vae 防长镜头解码 OOM")
+            runner_cmd.append("--tiled-vae")
         res = subprocess.run(runner_cmd, check=False)
         runner_rc = res.returncode
     finally:

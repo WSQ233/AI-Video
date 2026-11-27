@@ -205,6 +205,11 @@ def main() -> int:
         default="",
         help="可选：运行时覆盖 UNETLoader 的主模型文件名（仅允许 33.1B 未剪枝模型，如 minimax_h3_ref2va_int8_convrot.safetensors）",
     )
+    parser.add_argument(
+        "--tiled-vae",
+        action="store_true",
+        help="可选：将工作流中的 VAEDecode 自动替换为 VAEDecodeTiled，防止 24GB 级显存解码长镜头时 OOM",
+    )
     parser.add_argument("--server", default="http://127.0.0.1:8188", help="ComfyUI API 地址")
     parser.add_argument("--timeout", type=int, default=1800, help="单条任务超时时间（秒）")
     args = parser.parse_args()
@@ -304,6 +309,15 @@ def main() -> int:
                     node_inputs = node.get("inputs")
                     if isinstance(node_inputs, dict) and "unet_name" in node_inputs:
                         node_inputs["unet_name"] = override_unet
+        if args.tiled_vae and isinstance(prompt_graph, dict):
+            for node in prompt_graph.values():
+                if isinstance(node, dict) and node.get("class_type") == "VAEDecode":
+                    node["class_type"] = "VAEDecodeTiled"
+                    node_inputs = node.setdefault("inputs", {})
+                    node_inputs.setdefault("tile_size", 512)
+                    node_inputs.setdefault("overlap", 64)
+                    node_inputs.setdefault("temporal_size", 64)
+                    node_inputs.setdefault("temporal_overlap", 8)
 
         print(
             f"[{idx}/{total}] 开始执行 {task_id} "

@@ -97,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state a1c575553b10106c060e80e98ee0a558af736daa2f14d23c461c09d401be72e9 -->
+<!-- pipeline-baseline:state 74e1a9a6d2aaff9a372bc1df9266163a4aeffbe5f0903d2f85176f48748c3ab4 -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 
@@ -144,7 +144,7 @@ description: >-
 | 脚本路径 | 支持的 CLI 参数 |
 | :--- | :--- |
 | `scripts/assemble_film.py` | `--project-dir`, `--batch-name`, `--output-name`, `--normalize-audio`, `--dry-run` |
-| `scripts/batch_runner.py` | `--tasks-csv`, `--workflows-dir`, `--shared-workflows-dir`, `--output-dir`, `--project-dir`, `--comfy-input-dir`, `--batch-name`, `--only-tasks`, `--override-unet`, `--server`, `--timeout` |
+| `scripts/batch_runner.py` | `--tasks-csv`, `--workflows-dir`, `--shared-workflows-dir`, `--output-dir`, `--project-dir`, `--comfy-input-dir`, `--batch-name`, `--only-tasks`, `--override-unet`, `--tiled-vae`, `--server`, `--timeout` |
 | `scripts/drive_fast_io.py` | 位置参数 / 无可选标志 |
 | `scripts/extract_anchor_frame.py` | `--project-dir`, `--video`, `--timestamp`, `--last-frame`, `--character`, `--outfit`, `--scene`, `--keyframe-name`, `--out` |
 | `scripts/fetch_character_refs.py` | `--project-dir`, `--characters`, `--force` |
