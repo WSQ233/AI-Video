@@ -22,6 +22,7 @@ import argparse
 import json
 import math
 import os
+os.environ["MPLBACKEND"] = "Agg"
 import shutil
 import subprocess
 import sys
@@ -535,17 +536,16 @@ def stage_swap(
                     samples_emb.append((float(f.det_score) * math.sqrt(area), emb))
         if samples_emb:
             samples_emb.sort(key=lambda x: -x[0])
-            # 保留主中心 + 最多 4 个不同角度代表向量，彻底锁死低头/侧脸/抬头全姿态！
+            # 保留主中心 + 最多 4 个「同一演员的不同角度」向量（严格限制 0.46 <= sim < 0.80，绝不把切镜中的其他演员收进来！）
             picked = [samples_emb[0][1]]
             for _, emb in samples_emb[1:]:
                 if len(picked) >= 5:
                     break
                 sims = [float(np.dot(emb, p)) for p in picked]
-                # 同一个人不同姿态（如低头奏对 vs 抬头）或在主发言窗内高面积占比
-                if min(sims) < 0.78:
+                if max(sims) >= 0.46 and min(sims) < 0.80:
                     picked.append(emb)
             actor_bank[spk] = picked
-            print(f"  [多姿态原演员锁死] {spk:13s} -> 收录 {len(picked)} 组角度锚点向量", flush=True)
+            print(f"  [多姿态原演员锁死] {spk:13s} -> 收录 {len(picked)} 组同人角度锚点向量", flush=True)
 
     # 3. 逐帧高清换脸：5点 EMA 时序平滑 + FFHQ-512 正规对齐 GFPGANv1.4 + BiSeNet 语义遮罩 + 精确逆变换回贴
     ffhq_dst = np.array(FFHQ_512_KPS, dtype=np.float32)

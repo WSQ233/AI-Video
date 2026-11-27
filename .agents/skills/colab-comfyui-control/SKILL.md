@@ -97,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state 4bc5459ddcd9b4b3471e53e72edb6dc07b3664f83061c95f20f49800726d1f32 -->
+<!-- pipeline-baseline:state 989a9197888ed9930c5ef242534a2cc75baea0e7d378e9e103c623cba70b5429 -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 
@@ -137,7 +137,7 @@ description: >-
 | `notebooks/01_h100_comfyui_webui.ipynb` | 01 · Colab A100 80GB 启动 ComfyUI WebUI（按独立项目挂载云端资产） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=16`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False` |
 | `notebooks/02_h100_batch_runner.ipynb` | 02 · Colab A100 80GB 无头批处理量产（按独立项目隔离 + Drive API 极速预热 + 自动关机防烧卡） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `USE_DRIVE_API_TURBO=True`, `PROJECT_ID="01_rainy_signal"`, `ACTIVE_PACKS="minimax_h3_fl2va_bf16 minimax_h3_turbo_lora"`, `MODEL_LOAD_MODE="copy_to_local"`, `STAGE_BACKEND="auto"`, `RANGE_WORKERS=16`, `INSTALL_SAGEATTENTION=False`, `ENABLE_LTX_NODE=False`, `BATCH_NAME=""`, `AUTO_DISCONNECT=True` |
 | `notebooks/03_video_face_voice_replace.ipynb` | 03 · 原片精改三段式管线（多角色定向换脸 + 本尊音色中文克隆配音 + 说话人精准口型同步） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `PROJECT_ID="02_yongzheng_ep12_huang"`, `WORK_DIR="/content/work_replace"`, `TTS_ENGINE="chatterbox"`, `SKIP_LIPSYNC=False`, `AUTO_DISCONNECT=True` |
-| `notebooks/04_video_replace_v2_pro.ipynb` | 04 · 原片精改 v2 专业高清管线（IndexTTS-2 播音级清晰中文克隆 + 时序平滑 FFHQ-512 换脸/BiSeNet 遮罩 + ByteDance LatentSync 1.6 512px 口型） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `PROJECT_ID="02_yongzheng_ep12_huang"`, `WORK_DIR="/content/work_replace_v2"`, `CLIP_END_SEC=17.2`, `OUTPUT_NAME="02_yongzheng_ep12_huang_v2_15s_preview.mp4"`, `INFERENCE_STEPS=20`, `SKIP_LIPSYNC=False`, `AUTO_DISCONNECT=True` |
+| `notebooks/04_video_replace_v2_pro.ipynb` | 04 · 原片精改 v2 专业高清管线（IndexTTS-2 播音级清晰中文克隆 + 时序平滑 FFHQ-512 换脸/BiSeNet 遮罩 + ByteDance LatentSync 1.6 512px 口型） | `REPO_URL="https://github.com/WSQ233/AI-Video.git"`, `REPO_DIR="/content/AI-Video"`, `PROJECT_ID="02_yongzheng_ep12_huang"`, `WORK_DIR="/content/work_replace_v2"`, `CLIP_END_SEC=15.0`, `OUTPUT_NAME="02_yongzheng_ep12_huang_v2_15s_preview.mp4"`, `INFERENCE_STEPS=20`, `SKIP_LIPSYNC=False`, `AUTO_DISCONNECT=True` |
 
 ### 6.5 控制脚本与 CLI 参数 (`scripts/*.py`)
 

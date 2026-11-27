@@ -88,7 +88,7 @@
       "speaker": "trump",
       "orig_role": "kangxi",
       "fixed_start": 1.30,
-      "fixed_end": 4.85,
+      "fixed_end": 3.85,
       "orig_hint": "为什么没有二阿哥胤礽的荐章啊",
       "adapted_text": "为什么没有黄仁勋的荐章？"
     },
@@ -96,8 +96,8 @@
       "id": "shot06",
       "speaker": "marco_rubio",
       "orig_role": "tongguowei",
-      "fixed_start": 4.95,
-      "fixed_end": 17.05,
+      "fixed_start": 5.60,
+      "fixed_end": 14.00,
       "orig_hint": "皇上这话奴才不明白 因为废二阿哥 所以才推荐新太子 怎么还会有推举二阿哥的荐章",
       "adapted_text": "总统这话奴才不明白，因为废黄仁勋，所以才推荐新CEO，怎么还会有推举黄仁勋的荐章？"
     },
