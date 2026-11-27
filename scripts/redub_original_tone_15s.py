@@ -133,8 +133,10 @@ def trim_silence(arr: np.ndarray, thresh_db: float = -40.0, pad_sec: float = 0.0
 
 
 def transcribe_chars(whisper_model: Any, wav_path: Path, initial_prompt: str = "") -> list[dict[str, Any]]:
+    # 直接传入 16kHz float32 numpy 数组，彻底绕开新版 PyAV 与 faster-whisper decode_audio 的 metadata_errors 兼容问题
+    audio_16k = load_mono(wav_path, sr=16000)
     segments, _ = whisper_model.transcribe(
-        str(wav_path),
+        audio_16k,
         language="zh",
         word_timestamps=True,
         vad_filter=False,
