@@ -186,7 +186,6 @@ def ensure_deps(seed_vc_dir: Path, indextts_dir: Path) -> None:
         ("librosa", "librosa"),
         ("munch", "munch"),
         ("einops", "einops"),
-        ("descript-audio-codec", "dac"),
         ("hf_xet", "hf_xet"),
     ]:
         try:
@@ -198,11 +197,14 @@ def ensure_deps(seed_vc_dir: Path, indextts_dir: Path) -> None:
     if not (seed_vc_dir / "inference.py").is_file():
         if seed_vc_dir.exists():
             shutil.rmtree(seed_vc_dir)
-        run_cmd(["git", "clone", "--depth", "1", "https://github.com/Plachta/Seed-VC.git", str(seed_vc_dir)])
+        run_cmd(["git", "clone", "--depth", "1", "https://github.com/Plachtaa/seed-vc.git", str(seed_vc_dir)])
     # 安装 Seed-VC 所需轻量依赖（避免覆盖 torch）
-    for pkg in ("pyyaml", "scipy", "torchaudio", "transformers", "huggingface_hub", "hydra-core", "omegaconf"):
+    for pkg in ("pyyaml", "scipy", "torchaudio", "transformers", "huggingface_hub", "hydra-core", "omegaconf", "protobuf>=5.29.1"):
         try:
-            __import__(pkg.replace("-", "_").split("_")[0])
+            if pkg.startswith("protobuf"):
+                run_cmd([sys.executable, "-m", "pip", "install", "-q", pkg], check=False)
+            else:
+                __import__(pkg.replace("-", "_").split("_")[0])
         except Exception:
             run_cmd([sys.executable, "-m", "pip", "install", "-q", pkg])
 
