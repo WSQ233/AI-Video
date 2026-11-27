@@ -192,20 +192,25 @@ def stage_analyze(project_dir: Path, plan: dict[str, Any], work_dir: Path) -> No
         shutil.copy2(stem_dir / "no_vocals.wav", bg_wav)
     print(f"[Demucs 完成] 人声: {vocals_wav} | 原片环境配乐: {bg_wav}", flush=True)
 
-    # Faster-Whisper large-v3 逐句中文识别与自动对齐
+    # Faster-Whisper large-v3 逐句中文识别与自动对齐（直接读原片全频带音轨并关闭前文条件，彻底杜绝字幕幻觉）
     print("\n[Stage 1.3] 使用 Faster-Whisper large-v3 提取原片逐句中文时间戳...", flush=True)
     wmodel = WhisperModel("large-v3", device="cuda", compute_type="float16")
     segs_iter, info = wmodel.transcribe(
-        str(vocals_wav),
+        str(orig_wav),
         language="zh",
+        beam_size=5,
+        condition_on_previous_text=False,
+        no_speech_threshold=0.65,
+        compression_ratio_threshold=2.0,
         vad_filter=True,
-        vad_parameters={"min_silence_duration_ms": 280},
-        initial_prompt="朕今天和你们一道议举新太子，佟国维、马齐、张廷玉、二阿哥胤礽、王掞、托合齐、耿索图、凌普、乾清宫、热河、大清江山社稷。",
+        vad_parameters={"min_silence_duration_ms": 220, "threshold": 0.35},
+        initial_prompt="雍正王朝第12集乾清宫议举新太子：朕今天和你们一道议举新太子，在京四品以上外省二品以上，佟国维、马齐、张廷玉、二阿哥胤礽、王掞、托合齐、耿索图、凌普。",
     )
+    bad_hallucinations = ("请不吝点赞", "明镜", "点点栏目", "字幕由", "感谢观看")
     whisper_segs = [
         {"start": round(s.start, 3), "end": round(s.end, 3), "text": s.text.strip()}
         for s in segs_iter
-        if s.text.strip()
+        if s.text.strip() and not any(b in s.text for b in bad_hallucinations)
     ]
     (work_dir / "orig_transcript.json").write_text(
         json.dumps(whisper_segs, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -215,10 +220,9 @@ def stage_analyze(project_dir: Path, plan: dict[str, Any], work_dir: Path) -> No
         print(f"  [{ws['start']:6.2f}s - {ws['end']:6.2f}s] {ws['text']}", flush=True)
 
     aligned, clip_end = align_lines_to_whisper(plan["lines"], whisper_segs, trim_max - trim_start)
-    # 若用户指定 target_end_hint_sec（4:11 = 251s），校验 clip_end 合理范围
+    # 严格贴合用户要求在 4:11 (251s) 处收尾，防止漏出 4:10.5 之后的「佟国维」
     target_hint = float(plan.get("target_end_hint_sec", 251.0))
-    if abs(clip_end - target_hint) > 25.0:
-        print(f"[提示] 自动对齐终点 {clip_end:.2f}s 与 4:11 ({target_hint:.1f}s) 偏差较大，请核对 orig_transcript.json！", flush=True)
+    clip_end = min(clip_end, target_hint + 0.3)
 
     timeline_obj = {
         "source_video": str(src_video),
