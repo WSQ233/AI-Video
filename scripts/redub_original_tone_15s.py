@@ -379,8 +379,8 @@ def main() -> int:
     # Stage 2: Whisper 字级对齐原片老戏骨干声
     # -------------------------------------------------------------------------
     from faster_whisper import WhisperModel
-    print("[Stage 2] 加载 faster-whisper (medium) 对原片干声执行字级对齐...", flush=True)
-    wmodel = WhisperModel("medium", device="cuda", compute_type="float16")
+    print("[Stage 2] 加载 faster-whisper (medium, CPU int8 防 CUDA13/cuBLAS12 冲突) 对原片干声执行字级对齐...", flush=True)
+    wmodel = WhisperModel("medium", device="cpu", compute_type="int8")
     orig_prompt = "为什么没有二阿哥胤礽的荐章啊？皇上这话奴才不明白，因为废二阿哥，所以才推荐新太子，怎么还会有推举二阿哥的荐章？"
     orig_chars = transcribe_chars(wmodel, orig_vocals_32k, initial_prompt=orig_prompt)
     print("[原片字级识别结果]:", flush=True)
