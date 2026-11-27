@@ -95,7 +95,8 @@ def main() -> int:
     clip_specs = [
         ("h3_15s_s01_kangxi.mp4", 0.00, 3.85),
         ("h3_15s_s02_maqi.mp4", 3.85, 2.40),
-        ("h3_15s_s03_tongguowei.mp4", 5.75, 8.80),
+        ("h3_15s_s03a_tongguowei.mp4", 5.75, 4.55),
+        ("h3_15s_s03b_tongguowei.mp4", 10.20, 4.55),
     ]
     for name, start_sec, dur_sec in clip_specs:
         out_path = clips_dir / name
@@ -117,7 +118,8 @@ def main() -> int:
 
     audio_specs = [
         ("h3_15s_s01_trump_voice.wav", 1.15, 2.75, project_dir / "characters" / "trump" / "voice" / "ref_trump.wav"),
-        ("h3_15s_s03_rubio_voice.wav", 5.55, 8.35, project_dir / "characters" / "marco_rubio" / "voice" / "ref_marco_rubio.wav"),
+        ("h3_15s_s03a_rubio_voice.wav", 5.55, 4.10, project_dir / "characters" / "marco_rubio" / "voice" / "ref_marco_rubio.wav"),
+        ("h3_15s_s03b_rubio_voice.wav", 9.65, 4.30, project_dir / "characters" / "marco_rubio" / "voice" / "ref_marco_rubio.wav"),
     ]
     for out_name, start_sec, dur_sec, fallback_wav in audio_specs:
         out_wav = audio_dir / out_name

@@ -143,12 +143,17 @@ def main() -> int:
     if runner_rc != 0:
         raise RuntimeError(f"MiniMax H3 批处理未完全成功 (exit={runner_rc})，请查看日志: {log_file}")
 
-    # 4. 拼接 3 镜 H3 原生音视频输出并做 EBU R128 响度归一化（严禁添加任何字幕）
-    print("[阶段 4/4] 拼接 3 镜 H3 原生音视频成片（无字幕）并执行 ffprobe 质检...")
+    # 4. 拼接 4 镜 H3 原生音视频输出并做 EBU R128 响度归一化（严禁添加任何字幕）
+    print("[阶段 4/4] 拼接 4 镜 H3 原生音视频成片（无字幕）并执行 ffprobe 质检...")
     batch_dir = project_dir / "outputs" / args.batch_name
-    shot_ids = ["h3_15s_s01_trump", "h3_15s_s02_vance", "h3_15s_s03_rubio"]
-    shot_files = [find_shot_output(batch_dir, tid) for tid in shot_ids]
-    print("[已定位成片]", [str(p) for p in shot_files])
+    shot_specs = [
+        ("h3_15s_s01_trump", 0.0),
+        ("h3_15s_s02_vance", 0.40),  # 裁掉原片 3.85s 切点前 0.4s 横移边缘，保证纯万斯画面
+        ("h3_15s_s03a_rubio", 0.0),
+        ("h3_15s_s03b_rubio", 0.0),
+    ]
+    shot_items = [(find_shot_output(batch_dir, tid), trim_start) for tid, trim_start in shot_specs]
+    print("[已定位成片]", [(str(p), ts) for p, ts in shot_items])
 
     final_dir = project_dir / "outputs" / "final_cut"
     final_dir.mkdir(parents=True, exist_ok=True)
@@ -157,22 +162,24 @@ def main() -> int:
     # 使用 filter_complex 统一帧率/采样率拼接 + EBU R128 loudnorm，确保无缝音画同步
     filter_parts = []
     concat_inputs = []
-    for i in range(len(shot_files)):
+    for i, (_p, trim_start) in enumerate(shot_items):
+        v_trim = f"trim=start={trim_start:.2f},setpts=PTS-STARTPTS," if trim_start > 0 else ""
+        a_trim = f"atrim=start={trim_start:.2f},asetpts=PTS-STARTPTS," if trim_start > 0 else ""
         filter_parts.append(
-            f"[{i}:v]fps=24,scale=960:544:flags=lanczos,setsar=1,format=yuv420p[v{i}]"
+            f"[{i}:v]{v_trim}fps=24,scale=960:544:flags=lanczos,setsar=1,format=yuv420p[v{i}]"
         )
         filter_parts.append(
-            f"[{i}:a]aresample=32000:async=1,aformat=channel_layouts=stereo[a{i}]"
+            f"[{i}:a]{a_trim}aresample=32000:async=1,aformat=channel_layouts=stereo[a{i}]"
         )
         concat_inputs.append(f"[v{i}][a{i}]")
     filter_parts.append(
-        f"{''.join(concat_inputs)}concat=n={len(shot_files)}:v=1:a=1[vcat][acat]"
+        f"{''.join(concat_inputs)}concat=n={len(shot_items)}:v=1:a=1[vcat][acat]"
     )
     filter_parts.append("[acat]loudnorm=I=-16:TP=-1.5:LRA=11[aout]")
     filter_complex = ";".join(filter_parts)
 
     ffmpeg_cmd = ["ffmpeg", "-y"]
-    for p in shot_files:
+    for p, _ts in shot_items:
         ffmpeg_cmd.extend(["-i", str(p)])
     ffmpeg_cmd.extend([
         "-filter_complex", filter_complex,
