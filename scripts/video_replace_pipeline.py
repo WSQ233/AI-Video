@@ -536,6 +536,12 @@ def stage_dub(project_dir: Path, plan: dict[str, Any], work_dir: Path, tts_engin
 
     print(f"\n[Stage 2.1] 加载跨语种本尊音色中文克隆引擎 ({tts_engine})...", flush=True)
     if tts_engine == "chatterbox":
+        import perth
+        if getattr(perth, "PerthImplicitWatermarker", None) is None:
+            class _NoOpWatermarker:
+                def apply_watermark(self, wav: Any, sample_rate: Any = None) -> Any:
+                    return wav
+            perth.PerthImplicitWatermarker = getattr(perth, "DummyWatermarker", None) or _NoOpWatermarker
         from chatterbox.mtl_tts import ChatterboxMultilingualTTS
         model = ChatterboxMultilingualTTS.from_pretrained(device="cuda")
         sr_out = int(model.sr)
