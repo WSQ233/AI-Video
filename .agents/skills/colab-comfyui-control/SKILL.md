@@ -97,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state 58bcc15e7e5498db572c72ad36014ae0f23d0a598bb1920cdd219a4d127b186e -->
+<!-- pipeline-baseline:state 14c6850ac85cd90e06c3c7a1228e953da0c4b3484bbdc07177ffb2c46e916fbb -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 
@@ -152,6 +152,7 @@ description: >-
 | `scripts/new_project.py` | `--characters`, `--scenes`, `--repo-root`, `--drive-root`, `--source-video-url` |
 | `scripts/prep_h3_15s_clips.py` | `--project-dir`, `--repo-root`, `--width`, `--height`, `--fps` |
 | `scripts/prepare_source_video.py` | `--project-dir`, `--source-url`, `--source-video`, `--skip-download`, `--dry-run` |
+| `scripts/redub_original_tone_15s.py` | `--project-dir`, `--shared-models-dir`, `--batch-name`, `--work-dir`, `--seed-vc-dir`, `--indextts-dir`, `--diffusion-steps` |
 | `scripts/run_h3_15s_preview.py` | `--repo-root`, `--project`, `--batch-name`, `--drive-root`, `--stage-backend`, `--range-workers`, `--force-unet` |
 | `scripts/setup_env.py` | `--repo-root`, `--project`, `--packs`, `--mode`, `--stage-backend`, `--range-workers`, `--enable-ltx`, `--sageattention`, `--sync-project-configs` |
 | `scripts/sync_models_to_drive.py` | `--manifest`, `--repo-root`, `--project`, `--drive-root`, `--packs`, `--hf-token`, `--transfer-mode`, `--file-workers`, `--fetch-workers`, `--upload-chunk-mb`, `--force`, `--list` |
