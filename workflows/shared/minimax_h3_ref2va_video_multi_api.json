@@ -71,7 +71,7 @@
       "width": "__WIDTH__",
       "height": "__HEIGHT__",
       "length": "__FRAMES__",
-      "ref_image_size": "match"
+      "ref_image_size": "max"
     }
   },
   "7": {
@@ -90,7 +90,7 @@
     "class_type": "BasicScheduler",
     "inputs": {
       "model": ["2", 0],
-      "scheduler": "simple",
+      "scheduler": "beta",
       "steps": 8,
       "denoise": 1.0
     }

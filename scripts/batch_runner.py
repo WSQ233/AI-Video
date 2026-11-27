@@ -57,6 +57,7 @@ def resolve_project_image(image_ref: str, project_dir: Path, comfy_input_dir: Pa
             if char_dir.is_dir():
                 candidates.append((f"characters/{char_dir.name}/{fname}", char_dir / fname))
                 candidates.append((f"characters/{char_dir.name}/outfits/{fname}", char_dir / "outfits" / fname))
+                candidates.append((f"characters/{char_dir.name}/voice/{fname}", char_dir / "voice" / fname))
     if (project_dir / "images").exists():
         candidates.append((f"images/{fname}", project_dir / "images" / fname))
         candidates.append((f"images/keyframes/{fname}", project_dir / "images" / "keyframes" / fname))
@@ -68,6 +69,8 @@ def resolve_project_image(image_ref: str, project_dir: Path, comfy_input_dir: Pa
     if (project_dir / "videos").exists():
         candidates.append((f"videos/{fname}", project_dir / "videos" / fname))
         candidates.append((f"videos/source_clips/{fname}", project_dir / "videos" / "source_clips" / fname))
+    if (project_dir / "audio").exists():
+        candidates.append((f"audio/{fname}", project_dir / "audio" / fname))
     candidates.append((f"inputs/{fname}", project_dir / "inputs" / fname))
 
     for rel_path, full_path in candidates:
@@ -275,6 +278,7 @@ def main() -> int:
         resolved_image_2 = resolve_project_image(row.get("image_2", ""), project_dir, comfy_input_dir)
         resolved_image_3 = resolve_project_image(row.get("image_3", ""), project_dir, comfy_input_dir)
         resolved_video = resolve_project_image(row.get("video", ""), project_dir, comfy_input_dir)
+        resolved_audio = resolve_project_image(row.get("audio", ""), project_dir, comfy_input_dir)
         replacements: dict[str, Any] = {
             "__TASK_ID__": task_id,
             "__PROMPT__": row.get("prompt", ""),
@@ -283,6 +287,7 @@ def main() -> int:
             "__IMAGE_2__": resolved_image_2,
             "__IMAGE_3__": resolved_image_3,
             "__VIDEO__": resolved_video,
+            "__AUDIO__": resolved_audio,
             "__SEED__": seed,
             "__WIDTH__": int(row["width"]) if (row.get("width") or "").strip().isdigit() else 1344,
             "__HEIGHT__": int(row["height"]) if (row.get("height") or "").strip().isdigit() else 768,
@@ -303,7 +308,8 @@ def main() -> int:
         print(
             f"[{idx}/{total}] 开始执行 {task_id} "
             f"(workflow={wf_name}, frames={frames}/{fps}fps={frames/fps:.2f}s, "
-            f"image={resolved_image or 'None'}, image_2={resolved_image_2 or 'None'}, image_3={resolved_image_3 or 'None'}, video={resolved_video or 'None'}, seed={seed})..."
+            f"image={resolved_image or 'None'}, image_2={resolved_image_2 or 'None'}, image_3={resolved_image_3 or 'None'}, "
+            f"video={resolved_video or 'None'}, audio={resolved_audio or 'None'}, seed={seed})..."
         )
         t0 = time.time()
         try:
@@ -324,6 +330,7 @@ def main() -> int:
                 "image_2": resolved_image_2,
                 "image_3": resolved_image_3,
                 "video": resolved_video,
+                "audio": resolved_audio,
                 "outputs": files,
                 "elapsed_sec": elapsed,
                 "ts": datetime.now(timezone.utc).isoformat(),

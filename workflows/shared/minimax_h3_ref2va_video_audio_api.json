@@ -1,0 +1,153 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "minimax_h3_ref2va_bf16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": ["1", 0],
+      "lora_name": "minimax_h3_ref2v_turbo_8step_v1.1_768p_comfyui_bf16.safetensors",
+      "strength_model": 1.0
+    }
+  },
+  "3": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    }
+  },
+  "4": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    }
+  },
+  "5": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    }
+  },
+  "16": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "__IMAGE__"
+    }
+  },
+  "17": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "__IMAGE_2__"
+    }
+  },
+  "18": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "__VIDEO__",
+      "force_rate": "__FPS__",
+      "custom_width": "__WIDTH__",
+      "custom_height": "__HEIGHT__",
+      "frame_load_cap": "__FRAMES__",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "19": {
+    "class_type": "LoadAudio",
+    "inputs": {
+      "audio": "__AUDIO__"
+    }
+  },
+  "6": {
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "inputs": {
+      "clip": ["3", 0],
+      "vae": ["4", 0],
+      "audio_vae": ["5", 0],
+      "ref_images.ref_image_0": ["16", 0],
+      "ref_images.ref_image_1": ["17", 0],
+      "ref_videos.ref_video_0": ["18", 0],
+      "ref_audios.ref_audio_0": ["19", 0],
+      "prompt": "__PROMPT__",
+      "width": "__WIDTH__",
+      "height": "__HEIGHT__",
+      "length": "__FRAMES__",
+      "ref_image_size": "max"
+    }
+  },
+  "7": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": "__SEED__"
+    }
+  },
+  "8": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "res_multistep"
+    }
+  },
+  "9": {
+    "class_type": "BasicScheduler",
+    "inputs": {
+      "model": ["2", 0],
+      "scheduler": "beta",
+      "steps": 8,
+      "denoise": 1.0
+    }
+  },
+  "10": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": ["2", 0],
+      "conditioning": ["6", 0]
+    }
+  },
+  "11": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": ["7", 0],
+      "guider": ["10", 0],
+      "sampler": ["8", 0],
+      "sigmas": ["9", 0],
+      "latent_image": ["6", 1]
+    }
+  },
+  "12": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["11", 0],
+      "vae": ["4", 0]
+    }
+  },
+  "13": {
+    "class_type": "VAEDecodeAudio",
+    "inputs": {
+      "samples": ["11", 0],
+      "vae": ["5", 0]
+    }
+  },
+  "14": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": ["12", 0],
+      "audio": ["13", 0],
+      "fps": "__FPS__"
+    }
+  },
+  "15": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": ["14", 0],
+      "filename_prefix": "__OUTPUT_PREFIX__",
+      "format": "auto",
+      "codec": "auto"
+    }
+  }
+}

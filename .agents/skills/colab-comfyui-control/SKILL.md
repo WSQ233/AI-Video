@@ -97,7 +97,7 @@ description: >-
 > 以下区块由 `.agents/hooks/sync_colab_comfyui_skill.py` 根据仓库内 `configs/`、`scripts/`、`notebooks/` 与 `workflows/shared/` 实时生成并校验。修改任何流程脚本、配置、Notebook 或工作流模板时，项目级 Hook 会自动同步更新本区块。
 
 <!-- pipeline-baseline:begin -->
-<!-- pipeline-baseline:state 989a9197888ed9930c5ef242534a2cc75baea0e7d378e9e103c623cba70b5429 -->
+<!-- pipeline-baseline:state a1c575553b10106c060e80e98ee0a558af736daa2f14d23c461c09d401be72e9 -->
 
 ### 6.1 运行时配置与 GPU 档位 (`configs/runtime_profile.json`)
 
@@ -150,7 +150,9 @@ description: >-
 | `scripts/fetch_character_refs.py` | `--project-dir`, `--characters`, `--force` |
 | `scripts/freeze_locks.py` | `--comfy-dir`, `--lock-file`, `--out` |
 | `scripts/new_project.py` | `--characters`, `--scenes`, `--repo-root`, `--drive-root`, `--source-video-url` |
+| `scripts/prep_h3_15s_clips.py` | `--project-dir`, `--repo-root`, `--width`, `--height`, `--fps` |
 | `scripts/prepare_source_video.py` | `--project-dir`, `--source-url`, `--source-video`, `--skip-download`, `--dry-run` |
+| `scripts/run_h3_15s_preview.py` | `--repo-root`, `--project`, `--batch-name`, `--drive-root`, `--stage-backend`, `--range-workers`, `--force-unet` |
 | `scripts/setup_env.py` | `--repo-root`, `--project`, `--packs`, `--mode`, `--stage-backend`, `--range-workers`, `--enable-ltx`, `--sageattention`, `--sync-project-configs` |
 | `scripts/sync_models_to_drive.py` | `--manifest`, `--repo-root`, `--project`, `--drive-root`, `--packs`, `--hf-token`, `--transfer-mode`, `--file-workers`, `--fetch-workers`, `--upload-chunk-mb`, `--force`, `--list` |
 | `scripts/validate_storyboard.py` | `--repo-root`, `--project`, `--max-seconds` |
@@ -168,6 +170,7 @@ description: >-
 | `workflows/shared/minimax_h3_ref2va_multi3_api.json` | API 工作流 (18 节点) | `__FPS__`, `__FRAMES__`, `__HEIGHT__`, `__IMAGE_2__`, `__IMAGE_3__`, `__IMAGE__`, `__OUTPUT_PREFIX__`, `__PROMPT__`, `__SEED__`, `__WIDTH__` |
 | `workflows/shared/minimax_h3_ref2va_multi_api.json` | API 工作流 (17 节点) | `__FPS__`, `__FRAMES__`, `__HEIGHT__`, `__IMAGE_2__`, `__IMAGE__`, `__OUTPUT_PREFIX__`, `__PROMPT__`, `__SEED__`, `__WIDTH__` |
 | `workflows/shared/minimax_h3_ref2va_video_api.json` | API 工作流 (17 节点) | `__FPS__`, `__FRAMES__`, `__HEIGHT__`, `__IMAGE__`, `__OUTPUT_PREFIX__`, `__PROMPT__`, `__SEED__`, `__VIDEO__`, `__WIDTH__` |
+| `workflows/shared/minimax_h3_ref2va_video_audio_api.json` | API 工作流 (19 节点) | `__AUDIO__`, `__FPS__`, `__FRAMES__`, `__HEIGHT__`, `__IMAGE_2__`, `__IMAGE__`, `__OUTPUT_PREFIX__`, `__PROMPT__`, `__SEED__`, `__VIDEO__`, `__WIDTH__` |
 | `workflows/shared/minimax_h3_ref2va_video_multi_api.json` | API 工作流 (18 节点) | `__FPS__`, `__FRAMES__`, `__HEIGHT__`, `__IMAGE_2__`, `__IMAGE__`, `__OUTPUT_PREFIX__`, `__PROMPT__`, `__SEED__`, `__VIDEO__`, `__WIDTH__` |
 | `workflows/shared/video_minimax_h3_i2v.json` | UI 工作流 (9 节点) | 无（静态 UI 模板） |
 | `workflows/shared/video_minimax_h3_r2v.json` | UI 工作流 (29 节点) | 无（静态 UI 模板） |

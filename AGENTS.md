@@ -22,6 +22,10 @@
 ---
 
 ## 3. 模型选型规范
+- **强制默认视频模型红线（最高优先级，不可违背）**：
+  - **所有视频生成与原片视频编辑任务（包括文生视频、图生视频、原片视频人物/人脸替换、角色换装、声音与口型同步）均必须强制使用默认视频模型**。
+  - **本项目唯一默认视频模型为：MiniMax H3（`Comfy-Org/MiniMax-H3` · 33.1B 全参数未剪枝版）**。
+  - **严禁私自切换替代方案**：未经用户明确要求，严禁将视频生成或原片人物替换任务降级/私自切换为 2D 换脸工具（如 InsightFace / `inswapper`）、第三方非默认视频模型或其他独立口型拼接方案替代 MiniMax H3。
 - **唯一主力引擎**：**MiniMax H3（`Comfy-Org/MiniMax-H3` · 33.1B 全参数未剪枝无损版）**
   - 主模型：`minimax_h3_fl2va_bf16.safetensors`（61.7GB）、`minimax_h3_ref2va_bf16.safetensors`（61.7GB）
   - 文本/多模态编码器：`qwen3vl_32b_minimax_h3_int8_convrot.safetensors`（27.1GB）
@@ -31,6 +35,7 @@
 - **明确禁止项**：
   - **禁止默认引入或回退至 Wan 2.2**（除非用户明确提出）。
   - **禁止默认选用 20B 剪枝版（`pruned`）或低比特消费级 GGUF**；`configs/models_manifest.json` 与 `scripts/sync_models_to_drive.py` 中必须保留 `exclude_keywords: ["pruned"]` 防止路径自动匹配误下剪枝权重。
+  - **禁止未经授权使用 2D 换脸工具替代 MiniMax H3**：原片人物替换应通过 `MiniMaxH3ReferenceToVideo`（Ref2VA，绑定 `<Video 1>` 原片参考 + `<Picture 1..N>` 人物多角度参考 + `<Audio 1>` 声纹参考）端到端完成。
 
 ---
 
