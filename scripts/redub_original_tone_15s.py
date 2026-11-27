@@ -551,17 +551,17 @@ def main() -> int:
     s03a = find_shot_output(batch_dir, "h3_15s_s03a_rubio")
     s03b = find_shot_output(batch_dir, "h3_15s_s03b_rubio")
 
-    # 先按已验证的最佳画面切点与白边裁切拼接纯净视频轨（总时长 12.50s，960x544，24fps，零字幕）
+    # 先按已验证的最佳画面切点与白边裁切拼接纯净视频轨（总时长 12.55s，960x544，24fps，零字幕、零原片演员露脸）
     # 镜头时间段：
-    #   [0.00s - 3.75s] s01_trump (口型窗 1.25s - 3.65s)
-    #   [3.75s - 4.83s] s02_vance (1.08s 静默反应镜，原片咚——紧张弦乐切入)
-    #   [4.83s - 7.98s] s03a_rubio (3.15s，口型窗 C1: 5.05s-6.55s，C2: 6.70s-7.85s)
-    #   [7.98s - 12.44s] s03b_rubio (4.46s 满屏特写，口型窗 C3: 8.08s-9.60s，C4: 9.80s-12.35s)
+    #   [0.00s - 3.75s] s01_trump  (3.75s，口型窗 1.22s - 3.68s)
+    #   [3.75s - 4.83s] s02_vance  (1.08s 静默反应镜，1.25s起纯万斯零旧臣残留，原片咚——紧张弦乐切入)
+    #   [4.83s - 8.09s] s03a_rubio (3.26s，1.20s起彻底切掉马齐露脸横移，纯鲁比奥；口型窗 C1: 4.92s-6.95s，C2: 7.02s-8.06s)
+    #   [8.09s - 12.55s] s03b_rubio (4.46s 满屏特写去白边；口型窗 C3: 8.18s-9.68s，C4: 9.85s-12.48s)
     video_only = work_dir / "h3_15s_video_only.mp4"
     v_fc = (
         "[0:v]fps=24,scale=960:544:flags=lanczos,setsar=1,setpts=PTS-STARTPTS[v0];"
         "[1:v]trim=start=1.250,setpts=PTS-STARTPTS,fps=24,scale=960:544:flags=lanczos,setsar=1[v1];"
-        "[2:v]trim=start=0:end=3.15,setpts=PTS-STARTPTS,fps=24,scale=960:544:flags=lanczos,setsar=1[v2];"
+        "[2:v]trim=start=1.200,setpts=PTS-STARTPTS,fps=24,scale=960:544:flags=lanczos,setsar=1[v2];"
         "[3:v]crop=572:324:172:28,scale=960:544:flags=lanczos,setsar=1,fps=24,setpts=PTS-STARTPTS[v3];"
         "[v0][v1][v2][v3]concat=n=4:v=1:a=0[vcat]"
     )
@@ -581,13 +581,13 @@ def main() -> int:
     vocals_track = np.zeros(total_samples, dtype=np.float32)
     duck_mask = np.zeros(total_samples, dtype=np.float32)
 
-    # 将 5 句 Seed-VC 转换后的原片语气台词精准放入对应口型窗（仅微调 <=1.15x，保持绝对清晰不失真）
+    # 将 5 句 Seed-VC 转换后的原片语气台词精准放入对应口型窗（仅微调 <=1.18x，保持绝对清晰不失真）
     placements = [
         ("c0_trump", 1.22, 3.68),  # 为什么没有黄仁勋的荐章啊
-        ("c1_rubio", 5.02, 6.62),  # 总统这话，奴才不明白
-        ("c2_rubio", 6.72, 7.88),  # 因为废黄仁勋
-        ("c3_rubio", 8.05, 9.62),  # 所以才推荐新CEO
-        ("c4_rubio", 9.80, 12.38), # 怎么还会有推举黄仁勋的荐章
+        ("c1_rubio", 4.92, 6.95),  # 总统这话，奴才不明白
+        ("c2_rubio", 7.02, 8.06),  # 因为废黄仁勋
+        ("c3_rubio", 8.18, 9.68),  # 所以才推荐新CEO
+        ("c4_rubio", 9.85, 12.48), # 怎么还会有推举黄仁勋的荐章
     ]
     for key, t_start, t_end in placements:
         clip = vc_clips[key]
