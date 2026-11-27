@@ -20,6 +20,8 @@ import os
 import shutil
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -38,15 +40,42 @@ def probe_media(path: Path) -> dict[str, Any]:
     return json.loads(raw)
 
 
-def download_file(url: str, dest: Path, min_bytes: int = 10_000) -> Path:
+def download_file(url: str, dest: Path, min_bytes: int = 10_000, max_retries: int = 4) -> Path:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists() and dest.stat().st_size >= min_bytes:
         return dest
     tmp = dest.with_suffix(dest.suffix + ".part")
-    req = urllib.request.Request(url, headers={"User-Agent": "AI-Video-Pipeline/1.0"})
-    with urllib.request.urlopen(req, timeout=120) as resp, tmp.open("wb") as out:
-        shutil.copyfileobj(resp, out)
-    os.replace(tmp, dest)
+    headers = {
+        "User-Agent": "AI-Video-Pipeline/1.0 (https://github.com/WSQ233/AI-Video; educational-research)",
+        "Accept": "*/*",
+    }
+    last_exc: Exception | None = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=120) as resp, tmp.open("wb") as out:
+                shutil.copyfileobj(resp, out)
+            os.replace(tmp, dest)
+            return dest
+        except urllib.error.HTTPError as exc:
+            last_exc = exc
+            if exc.code in (429, 502, 503, 504) and attempt < max_retries:
+                retry_after = exc.headers.get("Retry-After") if exc.headers else None
+                wait_s = float(retry_after) if (retry_after and retry_after.isdigit()) else (4.0 * attempt)
+                print(f"  [下载限流 {exc.code}] 等待 {wait_s:.0f}s 后第 {attempt + 1}/{max_retries} 次重试...", flush=True)
+                time.sleep(wait_s)
+                continue
+            raise
+        except Exception as exc:
+            last_exc = exc
+            if attempt < max_retries:
+                wait_s = 3.0 * attempt
+                print(f"  [下载重试] {exc}，等待 {wait_s:.0f}s...", flush=True)
+                time.sleep(wait_s)
+                continue
+            raise
+    if last_exc:
+        raise last_exc
     return dest
 
 
@@ -435,13 +464,19 @@ def prepare_voice_refs(project_dir: Path, plan: dict[str, Any], work_dir: Path) 
     refs: dict[str, Path] = {}
     raw_dir = work_dir / "raw_voices"
     raw_dir.mkdir(parents=True, exist_ok=True)
+    needed_speakers = {str(ln["speaker"]) for ln in plan.get("lines", [])}
+    downloaded_any = False
     for spk, cfg in plan["voice_sources"].items():
+        if needed_speakers and spk not in needed_speakers:
+            continue
         target_wav = project_dir / cfg["local_rel"]
         target_wav.parent.mkdir(parents=True, exist_ok=True)
         if target_wav.exists() and target_wav.stat().st_size > 20_000:
             print(f"[声纹复用] {spk} -> {target_wav}", flush=True)
             refs[spk] = target_wav
             continue
+        if downloaded_any:
+            time.sleep(2.5)
         raw_ext = Path(cfg["url"].split("?")[0]).suffix or ".ogg"
         raw_file = raw_dir / f"{spk}_raw{raw_ext}"
         try:
@@ -453,6 +488,7 @@ def prepare_voice_refs(project_dir: Path, plan: dict[str, Any], work_dir: Path) 
             print(f"[声纹回退] {spk} 主链接失败 ({exc})，改用备用源...", flush=True)
             raw_file = raw_dir / f"{spk}_fb{Path(fb.split('?')[0]).suffix or '.ogg'}"
             download_file(fb, raw_file)
+        downloaded_any = True
         start_s = float(cfg.get("clip_start_sec", 5.0))
         dur_s = float(cfg.get("clip_duration_sec", 12.0))
         run_cmd([
@@ -738,8 +774,36 @@ def stage_faceswap(project_dir: Path, plan: dict[str, Any], work_dir: Path, shar
             print(f"[警告] 群臣参考图跳过 {bg_rel}: {exc}", flush=True)
 
     cluster_meta = json.loads(face_map_path.read_text(encoding="utf-8"))
+    # 自动合并同主角多角度次级聚类（如侧脸/低头/远景光照分裂出的康熙、佟国维、张廷玉），并应用人工复核覆写表
+    lead_roles = ("trump", "marco_rubio", "scott_bessent", "jd_vance")
+    lead_centroids: dict[str, Any] = {}
+    for cm in cluster_meta:
+        if cm["target"] in lead_roles and cm["target"] not in lead_centroids:
+            lead_centroids[cm["target"]] = np.array(cm["centroid"], dtype=np.float32)
+
+    overrides = {str(k): str(v) for k, v in plan.get("cluster_overrides", {}).items()}
+    merged_count = 0
+    for cm in cluster_meta:
+        cid_str = str(cm["cluster_id"])
+        if cid_str in overrides:
+            cm["target"] = overrides[cid_str]
+            continue
+        if cm["target"] in lead_roles:
+            continue
+        v = np.array(cm["centroid"], dtype=np.float32)
+        best_lead, best_sim = None, 0.0
+        for lr, lv in lead_centroids.items():
+            sim = float(np.dot(v, lv))
+            if sim > best_sim:
+                best_lead, best_sim = lr, sim
+        if best_lead and best_sim >= 0.42:
+            cm["target"] = best_lead
+            merged_count += 1
+            print(f"  [多角度主角聚类自动合并] Cluster #{cm['cluster_id']:2d} (n={cm['count']:2d}, sim={best_sim:.2f}) -> {best_lead}", flush=True)
+
     centroids = np.stack([np.array(cm["centroid"], dtype=np.float32) for cm in cluster_meta], axis=0)
     targets = [cm["target"] for cm in cluster_meta]
+    print(f"[角色映射就绪] 共 {len(cluster_meta)} 个聚类（自动合并主角多角度 {merged_count} 组，人工覆写 {len(overrides)} 组）", flush=True)
 
     cap = cv2.VideoCapture(str(work_clip))
     fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
@@ -765,16 +829,22 @@ def stage_faceswap(project_dir: Path, plan: dict[str, Any], work_dir: Path, shar
 
         if faces:
             for f in faces:
-                if f.det_score < 0.52:
+                if f.det_score < 0.50:
                     continue
                 x1, y1, x2, y2 = [int(v) for v in f.bbox]
-                if (x2 - x1) < 32 or (y2 - y1) < 32:
+                fw, fh = x2 - x1, y2 - y1
+                if fw < 34 or fh < 34:
                     continue
                 sims = centroids @ f.normed_embedding.astype(np.float32)
                 best_i = int(np.argmax(sims))
                 if float(sims[best_i]) < 0.36:
                     continue
                 tgt_key = targets[best_i]
+                if tgt_key == "skip":
+                    continue
+                # 仅对清晰前景群臣执行换脸，自动跳过远景虚化或背面侧头，杜绝闪烁穿帮
+                if tgt_key not in source_faces and (f.det_score < 0.68 or fw < 48 or fh < 48):
+                    continue
                 src_face = source_faces.get(tgt_key) or bg_sources.get(tgt_key)
                 if src_face is None:
                     continue

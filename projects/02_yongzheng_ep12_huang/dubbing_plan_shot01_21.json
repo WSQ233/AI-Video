@@ -73,6 +73,15 @@
       "characters/republicans/ref_republicans_extra.png"
     ]
   },
+  "cluster_overrides": {
+    "85": "marco_rubio",
+    "79": "skip",
+    "75": "skip",
+    "28": "skip",
+    "59": "skip",
+    "14": "skip",
+    "20": "skip"
+  },
   "lines": [
     {
       "id": "shot05c",
