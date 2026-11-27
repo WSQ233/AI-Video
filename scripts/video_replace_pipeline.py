@@ -718,8 +718,15 @@ def _match_lab_color(src_bgr: Any, dst_bgr: Any, mask: Any) -> Any:
 
 def stage_faceswap(project_dir: Path, plan: dict[str, Any], work_dir: Path, shared_models_dir: Path) -> None:
     import cv2
-    import insightface
     import numpy as np
+    import torch
+    import onnxruntime as ort
+    if hasattr(ort, "preload_dlls"):
+        try:
+            ort.preload_dlls(cuda=True, cudnn=True)
+        except Exception as exc:
+            print(f"[提示] ort.preload_dlls 跳过: {exc}", flush=True)
+    import insightface
     from gfpgan import GFPGANer
     from insightface.app import FaceAnalysis
 
@@ -737,6 +744,11 @@ def stage_faceswap(project_dir: Path, plan: dict[str, Any], work_dir: Path, shar
     )
     app.prepare(ctx_id=0, det_size=(640, 640))
     swapper = insightface.model_zoo.get_model(str(inswapper_path), providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+    print(
+        f"[GPU加速检查] torch.cuda={torch.cuda.is_available()} | ort={ort.__version__} | "
+        f"det={app.det_model.session.get_providers()} | swapper={swapper.session.get_providers()}",
+        flush=True,
+    )
     restorer = GFPGANer(
         model_path=str(gfpgan_path),
         upscale=1,
@@ -890,7 +902,7 @@ def stage_faceswap(project_dir: Path, plan: dict[str, Any], work_dir: Path, shar
         speaker_tracks.append(frame_track)
         writer.write(out_frame)
         idx += 1
-        if idx % 300 == 0 or idx == total_frames:
+        if idx % 100 == 0 or idx == total_frames:
             dt = max(1e-3, time.time() - t_stage3)
             cur_fps = idx / dt
             eta_min = (total_frames - idx) / max(cur_fps, 0.1) / 60.0
