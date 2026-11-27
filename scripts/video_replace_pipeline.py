@@ -151,22 +151,29 @@ def stage_analyze(project_dir: Path, plan: dict[str, Any], work_dir: Path) -> No
     trim_start = float(plan.get("trim_start_sec", 0.0))
 
     raw_cut = work_dir / "work_clip_raw.mp4"
-    print(f"\n[Stage 1.1] 截取工作区间 {trim_start:.1f}s ~ {trim_max:.1f}s -> {raw_cut}", flush=True)
-    run_cmd([
-        "ffmpeg", "-y", "-hide_banner", "-loglevel", "warning",
-        "-ss", f"{trim_start:.3f}", "-to", f"{trim_max:.3f}",
-        "-i", str(src_video),
-        "-c:v", "libx264", "-crf", "15", "-preset", "fast", "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-ar", "48000", "-ac", "2", "-b:a", "192k",
-        str(raw_cut),
-    ])
+    if not raw_cut.exists() or raw_cut.stat().st_size < 1_000_000:
+        local_src = work_dir / "src_local.mp4"
+        if not local_src.exists():
+            shutil.copy2(src_video, local_src)
+        print(f"\n[Stage 1.1] 截取工作区间 {trim_start:.1f}s ~ {trim_max:.1f}s -> {raw_cut}", flush=True)
+        run_cmd([
+            "ffmpeg", "-y", "-hide_banner", "-loglevel", "warning",
+            "-ss", f"{trim_start:.3f}", "-to", f"{trim_max:.3f}",
+            "-i", str(local_src),
+            "-c:v", "libx264", "-crf", "16", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-ar", "48000", "-ac", "2", "-b:a", "192k",
+            str(raw_cut),
+        ])
+    else:
+        print(f"\n[Stage 1.1 复用] 已存在截取工作区间: {raw_cut}", flush=True)
 
     orig_wav = work_dir / "orig_audio_48k.wav"
-    run_cmd([
-        "ffmpeg", "-y", "-hide_banner", "-loglevel", "warning",
-        "-i", str(raw_cut), "-vn", "-acodec", "pcm_s16le", "-ar", "48000", "-ac", "2",
-        str(orig_wav),
-    ])
+    if not orig_wav.exists() or orig_wav.stat().st_size < 100_000:
+        run_cmd([
+            "ffmpeg", "-y", "-hide_banner", "-loglevel", "warning",
+            "-i", str(raw_cut), "-vn", "-acodec", "pcm_s16le", "-ar", "48000", "-ac", "2",
+            str(orig_wav),
+        ])
 
     # Demucs 人声/背景音分离（100% 保留原片朝堂配乐与环境声）
     bg_wav = work_dir / "bg_music_ambience.wav"
