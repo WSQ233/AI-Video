@@ -200,13 +200,17 @@ def ensure_deps(seed_vc_dir: Path, indextts_dir: Path) -> None:
         if seed_vc_dir.exists():
             shutil.rmtree(seed_vc_dir)
         run_cmd(["git", "clone", "--depth", "1", "https://github.com/Plachtaa/seed-vc.git", str(seed_vc_dir)])
-    # 安装 Seed-VC 所需轻量依赖（避免覆盖 torch）
-    for pkg in ("pyyaml", "scipy", "torchaudio", "transformers", "huggingface_hub", "hydra-core", "omegaconf", "protobuf>=5.29.1"):
+    # 安装 Seed-VC 与 IndexTTS-2 兼容依赖（用 importlib.metadata 检查版本，避免提前导入旧版 transformers 污染 sys.modules）
+    import importlib.metadata
+    try:
+        tf_ver = importlib.metadata.version("transformers")
+    except Exception:
+        tf_ver = ""
+    if not tf_ver.startswith("4.52"):
+        run_cmd([sys.executable, "-m", "pip", "install", "-q", "transformers==4.52.1", "huggingface_hub>=0.30,<1.0"])
+    for pkg in ("pyyaml", "scipy", "torchaudio", "hydra-core", "omegaconf", "json5"):
         try:
-            if pkg.startswith("protobuf"):
-                run_cmd([sys.executable, "-m", "pip", "install", "-q", pkg], check=False)
-            else:
-                __import__(pkg.replace("-", "_").split("_")[0])
+            __import__(pkg.replace("-", "_").split("_")[0])
         except Exception:
             run_cmd([sys.executable, "-m", "pip", "install", "-q", pkg])
 
@@ -215,11 +219,22 @@ def ensure_deps(seed_vc_dir: Path, indextts_dir: Path) -> None:
         if indextts_dir.exists():
             shutil.rmtree(indextts_dir)
         run_cmd(["git", "clone", "--depth", "1", "https://github.com/index-tts/index-tts.git", str(indextts_dir)])
-        for pkg in ("cn2an", "g2p-en", "jieba", "pypinyin", "WeTextProcessing", "sentencepiece", "safetensors", "accelerate"):
-            try:
-                run_cmd([sys.executable, "-m", "pip", "install", "-q", pkg], check=False)
-            except Exception:
-                pass
+    for pkg, mod in [
+        ("cn2an", "cn2an"),
+        ("g2p-en", "g2p_en"),
+        ("jieba", "jieba"),
+        ("pypinyin", "pypinyin"),
+        ("WeTextProcessing", "tn"),
+        ("sentencepiece", "sentencepiece"),
+        ("safetensors", "safetensors"),
+        ("accelerate", "accelerate"),
+        ("descript-audiotools", "audiotools"),
+        ("modelscope", "modelscope"),
+    ]:
+        try:
+            __import__(mod)
+        except Exception:
+            run_cmd([sys.executable, "-m", "pip", "install", "-q", pkg], check=False)
 
 
 def ensure_indextts_ckpt(shared_models_dir: Path) -> Path:
@@ -387,17 +402,22 @@ def main() -> int:
     for c in orig_chars:
         print(f"  {c['start']:5.2f}s-{c['end']:5.2f}s: {c['ch']}", flush=True)
 
-    # 定位 5 处原片分句和待替换专有名词的时间区间
-    # Clause 0 (Kangxi): 为什么没有 [二阿哥胤礽] 的荐章啊 (1.50s - 4.45s)
-    c0_s, c0_e = 1.55, 4.45
-    span_c0_rep = find_span(orig_chars, ["二阿哥胤礽", "二阿哥英人", "二阿哥应仍", "二阿哥"], c0_s, c0_e)
+    # 定位 5 处原片分句和待替换专有名词的时间区间（对 C0/C1 单独再跑一次短窗识别，避免长窗漏识）
+    c0_s, c0_e = 1.45, 4.45
+    c0_chars = transcribe_chars(wmodel, kangxi_ref, initial_prompt="为什么没有二阿哥胤礽的荐章啊？")
+    c0_chars = [{"ch": c["ch"], "start": c["start"] + c0_s, "end": c["end"] + c0_s} for c in c0_chars]
+    print("[C0 康熙短窗字级识别]:", [(round(c["start"], 2), round(c["end"], 2), c["ch"]) for c in c0_chars], flush=True)
+    span_c0_rep = find_span(c0_chars, ["二阿哥胤礽", "二阿哥英人", "二阿哥应仍", "二阿哥", "阿哥"], c0_s, c0_e)
     if span_c0_rep is None:
         span_c0_rep = (2.38, 3.35)
     print(f"[定位 C0 康熙替换词] {span_c0_rep}", flush=True)
 
-    # Clause 1 (Tong): [皇上] 这话奴才不明白 (5.95s - 9.00s)
-    c1_s, c1_e = 5.95, 8.95
-    span_c1_rep = find_span(orig_chars, ["皇上", "皇"], c1_s, 7.20)
+    c1_s, c1_e = 5.90, 9.00
+    c1_ref = save_wav(work_dir / "orig_c1_ref.wav", orig_vocals[int(c1_s * SR):int(c1_e * SR)], SR)
+    c1_chars = transcribe_chars(wmodel, c1_ref, initial_prompt="皇上这话奴才不明白")
+    c1_chars = [{"ch": c["ch"], "start": c["start"] + c1_s, "end": c["end"] + c1_s} for c in c1_chars]
+    print("[C1 佟国维短窗字级识别]:", [(round(c["start"], 2), round(c["end"], 2), c["ch"]) for c in c1_chars], flush=True)
+    span_c1_rep = find_span(c1_chars, ["皇上", "皇"], c1_s, 7.20)
     if span_c1_rep is None:
         span_c1_rep = (6.00, 6.48)
     print(f"[定位 C1 佟国维替换词 皇上] {span_c1_rep}", flush=True)
