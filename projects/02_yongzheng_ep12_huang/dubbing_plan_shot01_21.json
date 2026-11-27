@@ -1,0 +1,286 @@
+{
+  "project_id": "02_yongzheng_ep12_huang",
+  "title": "雍正王朝第12集原片精改（Shot 01–21 · 0:00–4:11）：原片多角色换脸 + 本尊音色中文配音 + 精准口型同步",
+  "mode": "original_video_face_voice_lipsync_replace",
+  "source_video": "videos/raw_court_ep12.mp4",
+  "output_video": "outputs/final_cut/02_yongzheng_ep12_huang_shot01_21_replace.mp4",
+  "trim_start_sec": 0.0,
+  "trim_max_sec": 258.0,
+  "target_end_hint_sec": 251.0,
+  "voice_sources": {
+    "trump": {
+      "label": "特朗普 (Donald Trump)",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Donald_Trump_Ordering_Missile_Attacks_in_Retaliation_for_Syrian_Chemical_Strikes.ogg",
+      "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Donald_Trump_speaks_on_declaration_of_Covid-19_as_a_Global_Pandemic_by_the_World_Health_Organization.ogg",
+      "clip_start_sec": 8.0,
+      "clip_duration_sec": 12.0,
+      "local_rel": "characters/trump/voice/ref_trump.wav"
+    },
+    "marco_rubio": {
+      "label": "鲁比奥 (Marco Rubio)",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Marco_Rubio_honors_Senate_staffer_who_passed_away.ogg",
+      "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Marco_Rubio_on_the_FY26_Department_of_State_Budget_Request.wav",
+      "clip_start_sec": 12.0,
+      "clip_duration_sec": 12.0,
+      "local_rel": "characters/marco_rubio/voice/ref_marco_rubio.wav"
+    },
+    "scott_bessent": {
+      "label": "贝森特 (Scott Bessent)",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Scott_Bessent%27s_Opening_Statement_to_the_U.S_Senate_during_a_Confirmation_Hearing.ogg",
+      "fallback_url": "",
+      "clip_start_sec": 20.0,
+      "clip_duration_sec": 12.0,
+      "local_rel": "characters/scott_bessent/voice/ref_scott_bessent.wav"
+    },
+    "jd_vance": {
+      "label": "万斯 (JD Vance)",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/JD_Vance_questions_witnesses_on_the_effectiveness_of_Russian_sanctions.ogg",
+      "fallback_url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/JD_Vance_Delivers_Remarks_at_the_Munich_Security_Conference_%28February_14%2C_2025%29.ogg",
+      "clip_start_sec": 6.0,
+      "clip_duration_sec": 12.0,
+      "local_rel": "characters/jd_vance/voice/ref_jd_vance.wav"
+    }
+  },
+  "face_portraits": {
+    "trump": [
+      "characters/trump/ref_trump_front.png",
+      "characters/trump/ref_trump_half.png",
+      "characters/trump/ref_trump_full.png"
+    ],
+    "marco_rubio": [
+      "characters/marco_rubio/ref_marco_rubio_front.png",
+      "characters/marco_rubio/ref_marco_rubio_half.png",
+      "characters/marco_rubio/ref_marco_rubio_full.png"
+    ],
+    "scott_bessent": [
+      "characters/scott_bessent/ref_scott_bessent_front.png",
+      "characters/scott_bessent/ref_scott_bessent_half.png",
+      "characters/scott_bessent/ref_scott_bessent_full.png"
+    ],
+    "jd_vance": [
+      "characters/jd_vance/ref_jd_vance_front.png",
+      "characters/jd_vance/ref_jd_vance_half.png",
+      "characters/jd_vance/ref_jd_vance_full.png"
+    ],
+    "background_pool": [
+      "characters/democrats/ref_democrats_front.png",
+      "characters/republicans/ref_republicans_front.png",
+      "characters/democrats/ref_democrats_half.png",
+      "characters/republicans/ref_republicans_half.png",
+      "characters/democrats/ref_democrats_full.png",
+      "characters/republicans/ref_republicans_full.png",
+      "characters/democrats/ref_democrats_extra.png",
+      "characters/republicans/ref_republicans_extra.png"
+    ]
+  },
+  "lines": [
+    {
+      "id": "shot01",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "朕今天和你们一道议举新太子 记得是在十一月十二日 朕在上谕中说过",
+      "orig_keywords": ["议举", "新太子", "上谕", "说过", "记得"],
+      "adapted_text": "朕今天和你们一道议举新CEO。记得是在十一月十二日，朕在上谕中说过，"
+    },
+    {
+      "id": "shot02",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "在京四品以上 外省二品以上 都可以推举一位皇子作为新太子的人选 朕一惟公议是从 决无偏私",
+      "orig_keywords": ["四品", "二品", "推举", "公议", "偏私"],
+      "adapted_text": "白宫内阁、英伟达董事会，都可以推举一位人选作为新CEO的人选。朕一惟公议是从，决无偏私。"
+    },
+    {
+      "id": "shot03",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "现在这荐章都上来了 从这些荐章的情况来看 新太子的人选似乎已经出来了 可是这些荐章又能说明什么",
+      "orig_keywords": ["荐章", "上来了", "情况来看", "说明什么"],
+      "adapted_text": "现在这荐章都上来了，从这些荐章的情况来看，新CEO的人选似乎已经出来了。可是这些荐章又能说明什么？"
+    },
+    {
+      "id": "shot04",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "外省的不说 在京的你们都来了 你们推举的人都是你们自己看准的吗 我看未必见得",
+      "orig_keywords": ["外省", "在京", "看准", "未必"],
+      "adapted_text": "英伟达董事会的不说，白宫内阁的你们都来了，你们推举的人都是你们自己看准的吗？我看未必见得。"
+    },
+    {
+      "id": "shot05a",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "佟国维 马齐",
+      "orig_keywords": ["佟国维", "马齐", "马奇"],
+      "adapted_text": "鲁比奥、万斯！"
+    },
+    {
+      "id": "shot05b",
+      "speaker": "jd_vance",
+      "orig_role": "maqi",
+      "orig_hint": "臣在 奴才在",
+      "orig_keywords": ["臣在", "奴才在"],
+      "adapted_text": "臣在。"
+    },
+    {
+      "id": "shot05c",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "为什么没有二阿哥的荐章 为什么没有废太子的荐章",
+      "orig_keywords": ["为什么没有", "二阿哥", "太子", "荐章"],
+      "adapted_text": "为什么没有黄仁勋的荐章？"
+    },
+    {
+      "id": "shot06",
+      "speaker": "marco_rubio",
+      "orig_role": "tongguowei",
+      "orig_hint": "皇上这话奴才不明白 因为废太子 所以才推荐新太子 怎么还会有推举太子的荐章",
+      "orig_keywords": ["不明白", "废太子", "推荐", "怎么还会"],
+      "adapted_text": "总统这话奴才不明白，因为废黄仁勋，所以才推荐新CEO，怎么还会有推举黄仁勋的荐章？"
+    },
+    {
+      "id": "shot07",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "朕现在不是问你应不应该推举胤礽 而是问你有没有人推举胤礽",
+      "orig_keywords": ["不是问你", "应不应该", "而是问你", "有没有人"],
+      "adapted_text": "朕现在不是问你应不应该推举黄仁勋，而是问你有没有人推举黄仁勋！"
+    },
+    {
+      "id": "shot08",
+      "speaker": "marco_rubio",
+      "orig_role": "tongguowei",
+      "orig_hint": "有倒是有 不过多数是前太子一党的人 像托合齐 耿索图 凌普等 他们写的荐章当然不能作数",
+      "orig_keywords": ["有倒是有", "一党", "托合齐", "凌普", "不能作数"],
+      "adapted_text": "有倒是有，不过多数是前CEO一党的人，像科莱特·克雷斯、马拉科夫斯基、杰伊·普里等，他们写的荐章当然不能作数。"
+    },
+    {
+      "id": "shot09a",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "那么王掞呢",
+      "orig_keywords": ["王掞", "那么"],
+      "adapted_text": "那么马斯克呢？"
+    },
+    {
+      "id": "shot09b",
+      "speaker": "marco_rubio",
+      "orig_role": "tongguowei",
+      "orig_hint": "王掞的荐章也不能作数",
+      "orig_keywords": ["王掞", "不能作数"],
+      "adapted_text": "马斯克的荐章也不能作数。"
+    },
+    {
+      "id": "shot10",
+      "speaker": "marco_rubio",
+      "orig_role": "tongguowei",
+      "orig_hint": "王掞十一月十二日在乾清宫狂悖犯上 当时就被皇上驳斥了 所以他写的荐章也不能作数",
+      "orig_keywords": ["乾清宫", "狂悖", "驳斥", "不能作数"],
+      "adapted_text": "马斯克十一月十二日在白宫椭圆形办公室狂悖犯上，当时就被总统驳斥了，所以他写的荐章也不能作数。"
+    },
+    {
+      "id": "shot11a",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "你们 你们 你们中间 有没有人推举胤礽的",
+      "orig_keywords": ["你们中间", "有没有人", "推举"],
+      "adapted_text": "你们、你们……你们中间，有没有人推举黄仁勋的？"
+    },
+    {
+      "id": "shot11b",
+      "speaker": "scott_bessent",
+      "orig_role": "zhangtingyu",
+      "orig_hint": "有 臣推举的就是二阿哥 臣推举的就是胤礽",
+      "orig_keywords": ["有", "臣推举", "就是"],
+      "adapted_text": "有，臣推举的就是黄仁勋。"
+    },
+    {
+      "id": "shot12",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "你们有些事可能会觉得很奇怪 甚至有人会认为朕是出尔反尔 这里 朕要说明一下",
+      "orig_keywords": ["觉得很奇怪", "出尔反尔", "说明一下"],
+      "adapted_text": "你们有些事可能会觉得很奇怪，甚至有人会认为朕是出尔反尔。这里，朕要说明一下："
+    },
+    {
+      "id": "shot13",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "废黜太子 是朕一人独断专行 事先没有和你们商量 这有几个原因 一是朕当时驻跸热河",
+      "orig_keywords": ["废黜", "独断专行", "商量", "热河"],
+      "adapted_text": "废黜CEO，是英伟达董事会独断专行，事先没有和你们商量。这有几个原因：一是朕当时驻跸海湖庄园，"
+    },
+    {
+      "id": "shot14",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "事起肘腋之间 许多情形晦暗不明 为祖宗基业想 为大清江山想 也不得不先稳大局",
+      "orig_keywords": ["肘腋", "晦暗", "大清", "江山", "大局"],
+      "adapted_text": "事起肘腋之间，许多情形晦暗不明，为美股与AI霸权想、为美利坚国运想，也不得不先稳大局；"
+    },
+    {
+      "id": "shot15",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "二是当时胤礽的荒诞不经 实在是叫人不可忍 也不可解 但事后看来 他的那些事情",
+      "orig_keywords": ["荒诞", "不可忍", "不可解", "事后看来"],
+      "adapted_text": "二是当时黄仁勋的荒诞不经，实在是叫人不可忍，也不可解。但事后看来，他的那些事情，"
+    },
+    {
+      "id": "shot16",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "有些是捕风捉影 纯属子虚 有的则是着了别人的暗算 才使得一时失察 进退失据 张廷玉的折子写得好",
+      "orig_keywords": ["捕风捉影", "暗算", "折子", "写得好", "张廷玉"],
+      "adapted_text": "有些是捕风捉影、纯属子虚，有的则是著了别人的暗算，才使得一时失察、进退失据。贝森特的折子写得好："
+    },
+    {
+      "id": "shot17",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "所谓无心为恶 虽恶不罚 况且胤礽之过因病所致",
+      "orig_keywords": ["无心为恶", "虽恶不罚", "之过"],
+      "adapted_text": "所谓无心为恶，虽恶不罚。况且黄仁勋之过因风波所致，如今既已辞职退居外部，正合外部寻帅之规。"
+    },
+    {
+      "id": "shot18",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "伏祈皇上念昔日父子之情 施宽容之道 外则延良医以治其病 内则施圣意以感其心",
+      "orig_keywords": ["宽容之道", "治其", "感其心"],
+      "adapted_text": "伏祈总统念昔日知遇之情、施宽容之道，外则增设首席合规官以制度治其弊，内则礼聘归位以圣意感其心，"
+    },
+    {
+      "id": "shot19a",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "倘能使胤礽悔过自新 修心向善 则不仅为皇上之福 亦大清与天下苍生之福 张廷玉",
+      "orig_keywords": ["向善", "天下", "张廷玉"],
+      "adapted_text": "倘能使黄仁勋重振英伟达、修心向善，则不仅为硅谷之福，亦美利坚与天下股民之福。——贝森特！"
+    },
+    {
+      "id": "shot19b",
+      "speaker": "scott_bessent",
+      "orig_role": "zhangtingyu",
+      "orig_hint": "臣在",
+      "orig_keywords": ["臣在"],
+      "adapted_text": "臣在！"
+    },
+    {
+      "id": "shot20",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "你这个书读得好 好就好在 时刻不忘圣贤的忠恕之道 与人为善 好就好在时刻以大清江山社稷为重",
+      "orig_keywords": ["书读得好", "忠恕之道", "与人为善", "江山社稷"],
+      "adapted_text": "你这个书读得好！好就好在，时刻不忘大局的忠恕之道，与人为善；好就好在时刻以美利坚AI江山社稷为重，"
+    },
+    {
+      "id": "shot21",
+      "speaker": "trump",
+      "orig_role": "kangxi",
+      "orig_hint": "而不像有些人 趋炎附势 见风使舵 想的不是江山社稷 而是他自己的身家性命",
+      "orig_keywords": ["而不像有些人", "见风使舵", "江山社稷", "身家性命", "禄位"],
+      "adapted_text": "而不像有些人，趋红踩黑、见风使舵，想的不是江山社稷，而是他自己的选票与禄位！"
+    }
+  ]
+}
